@@ -1,0 +1,1503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EasyHygie · HACCP</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f6ff;--sf:#fff;--sf2:#f4f8ff;--sf3:#e8f0fe;
+  --bd:#d0e0f7;--bd2:#e2ecfb;
+  --tx:#0f2447;--mu:#6b85a8;
+  --gn:#0fa968;--dg:#e53e3e;--wn:#d97706;
+  --bl:#2563eb;--sky:#0ea5e9;--mint:#10b981;--pu:#7c3aed;
+  --r:12px;--rs:8px;
+  --sh:0 4px 24px rgba(37,99,235,.10);--sh2:0 1px 4px rgba(37,99,235,.08);
+  --fh:'Plus Jakarta Sans',sans-serif;--fm:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--tx);font-family:var(--fh);font-size:13px;min-height:100vh;overflow-x:hidden}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;z-index:999;background:linear-gradient(160deg,#dff1fc,#e8f4fd 50%,#d6ecfb);display:flex;align-items:center;justify-content:center;overflow:hidden}
+#login-screen.hidden{display:none}
+.lbubble{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 28% 28%,rgba(255,255,255,.95),rgba(186,225,255,.45) 50%,rgba(147,210,255,.15));border:1px solid rgba(255,255,255,.8);box-shadow:inset -3px -3px 8px rgba(147,210,255,.3),inset 2px 2px 6px rgba(255,255,255,.9)}
+.lbubble::after{content:'';position:absolute;top:18%;left:22%;width:28%;height:22%;border-radius:50%;background:rgba(255,255,255,.7);transform:rotate(-30deg)}
+@keyframes lrise{0%{transform:translateY(0);opacity:0}8%{opacity:.85}85%{opacity:.5}100%{transform:translateY(-110vh) translateX(var(--dx,20px));opacity:0}}
+.thdeco{position:absolute;opacity:.15;animation:tdeco 8s ease-in-out infinite}
+@keyframes tdeco{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(5deg)}}
+.lwaves{position:absolute;bottom:0;left:0;width:100%;pointer-events:none}
+.lcard-wrap{position:relative;z-index:10;width:100%;max-width:400px;padding:20px}
+.lcard{background:rgba(255,255,255,.88);backdrop-filter:blur(20px) saturate(1.4);border-radius:24px;border:1.5px solid rgba(255,255,255,.9);box-shadow:0 20px 60px rgba(14,165,233,.14);padding:36px 32px 28px;animation:lcardIn .5s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes lcardIn{from{opacity:0;transform:translateY(30px) scale(.95)}to{opacity:1;transform:none}}
+.llogozone{text-align:center;margin-bottom:28px}
+.llogomark{display:inline-flex;align-items:center;justify-content:center;width:68px;height:68px;border-radius:20px;margin-bottom:12px;background:linear-gradient(135deg,#0ea5e9,#1d4ed8);box-shadow:0 8px 28px rgba(14,165,233,.4);position:relative;overflow:hidden;animation:lpulse 3s ease-in-out infinite}
+@keyframes lpulse{0%,100%{box-shadow:0 8px 28px rgba(14,165,233,.4)}50%{box-shadow:0 8px 36px rgba(14,165,233,.65),0 0 0 6px rgba(14,165,233,.12)}}
+.llogomark::after{content:'';position:absolute;top:0;left:0;right:0;height:50%;background:linear-gradient(180deg,rgba(255,255,255,.3),transparent);border-radius:20px 20px 0 0}
+.llogosvg{width:36px;height:36px;position:relative;z-index:1}
+.lbrand{font-size:24px;font-weight:900;color:var(--tx);letter-spacing:-.5px}
+.lbrand span{color:var(--sky)}
+.ltag{font-size:10px;color:var(--mu);letter-spacing:2px;text-transform:uppercase;margin-top:2px;font-weight:600}
+.lfield{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
+.lfield label{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--mu);font-weight:700}
+.lfield input{background:#f4f9ff;border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:14px;font-weight:500;padding:11px 14px;border-radius:var(--rs);outline:none;transition:all .18s}
+.lfield input:focus{border-color:var(--sky);background:#fff;box-shadow:0 0 0 4px rgba(14,165,233,.12)}
+.lfield input::placeholder{color:rgba(107,137,174,.45)}
+.lpw{position:relative}.lpw input{padding-right:44px}
+.lpwbtn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--mu);font-size:16px;padding:4px;transition:color .15s}
+.lpwbtn:hover{color:var(--bl)}
+.lbtn{width:100%;padding:13px;margin-top:4px;background:linear-gradient(135deg,var(--sky),var(--bl));color:#fff;border:none;border-radius:var(--rs);font-family:var(--fh);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;box-shadow:0 4px 20px rgba(14,165,233,.35);position:relative;overflow:hidden}
+.lbtn::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.15),transparent)}
+.lbtn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(14,165,233,.45)}
+.lbtn:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.lerr{background:rgba(229,62,62,.08);border:1.5px solid rgba(229,62,62,.25);border-radius:var(--rs);padding:10px 14px;font-size:12.5px;color:var(--dg);text-align:center;font-weight:600;margin-top:10px;display:none;animation:lshake .35s ease}
+.lerr.on{display:block}
+@keyframes lshake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.lok{background:rgba(15,169,104,.08);border:1.5px solid rgba(15,169,104,.25);border-radius:var(--rs);padding:10px 14px;font-size:12.5px;color:var(--gn);text-align:center;font-weight:600;margin-top:10px;display:none}
+.lok.on{display:block}
+.lsp{display:none;align-items:center;justify-content:center;gap:8px}
+.lsp.on{display:inline-flex}
+.lspinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:lspin .7s linear infinite}
+@keyframes lspin{to{transform:rotate(360deg)}}
+.ltxt{display:inline-flex;align-items:center;gap:6px}
+.lfooter{text-align:center;margin-top:14px;font-size:11px;color:var(--mu)}
+
+/* ── APP ── */
+#app-screen{display:none}
+#app-screen.visible{display:flex;min-height:100vh}
+.bg-bubbles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bubble{position:absolute;bottom:-80px;border-radius:50%;animation:rise linear infinite;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.9),rgba(147,210,255,.3));box-shadow:inset 0 0 10px rgba(255,255,255,.6);border:1px solid rgba(147,210,255,.5)}
+@keyframes rise{0%{bottom:-80px;opacity:0;transform:translateX(0) scale(1)}10%{opacity:.7}90%{opacity:.4}100%{bottom:110vh;opacity:0;transform:translateX(var(--drift,30px)) scale(1.1)}}
+.app{position:relative;z-index:1;display:flex;width:100%;min-height:100vh}
+
+/* SIDEBAR */
+aside{width:240px;flex-shrink:0;background:linear-gradient(180deg,#0f2447,#163369 60%,#1e4080);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;overflow-y:auto;box-shadow:4px 0 24px rgba(15,36,71,.2)}
+.logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+.logo-wrap{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.logo-icon{width:44px;height:44px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,#06b6d4,#2563eb);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(6,182,212,.4);position:relative;overflow:hidden}
+.logo-icon::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.4),transparent)}
+.logo-svg{width:26px;height:26px;fill:white}
+.logo-text{font-family:var(--fh);font-weight:800;font-size:18px;color:#fff;letter-spacing:-.3px}
+.logo-text span{color:#67e8f9}
+.logo-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:2px;text-transform:uppercase;margin-left:56px}
+nav{flex:1;padding:8px 0}
+.nsec{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:14px 20px 4px;font-weight:600}
+.ni{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;border-left:3px solid transparent;transition:all .18s;color:rgba(255,255,255,.55);font-size:12.5px;font-weight:500;user-select:none;margin:1px 0}
+.ni:hover{color:rgba(255,255,255,.9);background:rgba(255,255,255,.07);border-left-color:rgba(255,255,255,.3)}
+.ni.active{color:#fff;border-left-color:#67e8f9;background:rgba(103,232,249,.1)}
+.ni .ic{font-size:15px;width:20px;text-align:center}
+.nbadge{margin-left:auto;background:#e53e3e;color:#fff;font-size:10px;border-radius:20px;padding:1px 7px;display:none;font-weight:600}
+.nbadge.on{display:block}
+.ni-admin-only{display:none}
+.ni-admin-only.visible{display:flex}
+.thermo-widget{margin:14px 20px;background:rgba(255,255,255,.06);border-radius:10px;padding:12px 14px;border:1px solid rgba(255,255,255,.08)}
+.thermo-title{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.thermo-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.thermo-bar-wrap{flex:1;height:6px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden}
+.thermo-bar{height:100%;border-radius:3px;transition:width 1s ease}
+.thermo-label{font-size:10px;color:rgba(255,255,255,.6);min-width:52px;text-align:right}
+.user-card{margin:10px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#2563eb);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;flex-shrink:0}
+.user-avatar.admin{background:linear-gradient(135deg,#d97706,#dc2626)}
+.user-info{flex:1;min-width:0}
+.user-nom{font-size:12px;color:#fff;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-id{font-size:10px;color:rgba(255,255,255,.4)}
+.user-statut{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:1px 6px;border-radius:10px;margin-top:2px;display:inline-block}
+.user-statut.admin{background:rgba(220,166,6,.2);color:#fbbf24}
+.user-statut.employe{background:rgba(14,165,233,.2);color:#7dd3fc}
+.user-logout{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;font-size:14px;padding:4px;border-radius:6px;transition:all .15s;line-height:1}
+.user-logout:hover{color:#e53e3e;background:rgba(229,62,62,.15)}
+.sver{padding:10px 20px;border-top:1px solid rgba(255,255,255,.07);font-size:10px;color:rgba(255,255,255,.3);text-align:center}
+
+/* MAIN */
+main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+.topbar{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--bd);padding:14px 28px;display:flex;align-items:center;gap:14px;position:sticky;top:0;z-index:10;box-shadow:var(--sh2)}
+.ptitle{font-family:var(--fh);font-weight:700;font-size:18px;flex:1;color:var(--tx)}
+.content{padding:28px;flex:1}
+.panel{display:none}
+.panel.active{display:block;animation:fi .22s ease}
+@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:var(--rs);font-family:var(--fh);font-size:12.5px;cursor:pointer;transition:all .16s;font-weight:600;white-space:nowrap}
+.bp{background:linear-gradient(135deg,var(--bl),var(--sky));color:#fff;box-shadow:0 2px 10px rgba(37,99,235,.25)}
+.bp:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.35)}
+.bd2{background:transparent;color:var(--dg);border:1.5px solid var(--dg)}.bd2:hover{background:rgba(229,62,62,.08)}
+.bg{background:var(--sf);border:1.5px solid var(--bd);color:var(--tx)}.bg:hover{border-color:var(--bl);color:var(--bl)}
+.bw{background:rgba(217,119,6,.1);color:var(--wn);border:1.5px solid var(--wn)}.bw:hover{background:rgba(217,119,6,.2)}
+.bpurple{background:linear-gradient(135deg,var(--pu),#9333ea);color:#fff;box-shadow:0 2px 10px rgba(124,58,237,.25)}
+.bpurple:hover{transform:translateY(-1px)}
+.bdanger{background:linear-gradient(135deg,#dc2626,#e53e3e);color:#fff;box-shadow:0 2px 10px rgba(220,38,38,.3)}
+.bdanger:hover{transform:translateY(-1px)}
+.sm{padding:5px 11px;font-size:11.5px}
+
+/* CARDS */
+.card{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh2)}
+.card-h{padding:14px 20px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.card-t{font-family:var(--fh);font-weight:700;font-size:14px;color:var(--tx)}
+.card-b{padding:18px 20px}
+
+/* KPI */
+.kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:28px}
+.kc{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;box-shadow:var(--sh2)}
+.kc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--cc,var(--bl)),var(--cc2,var(--sky)))}
+.kc::after{content:'';position:absolute;top:0;right:0;width:60px;height:60px;border-radius:50%;background:radial-gradient(circle,var(--cc,rgba(37,99,235,.08)),transparent);transform:translate(20px,-20px)}
+.kc:hover{border-color:var(--cc,var(--bl));transform:translateY(-3px);box-shadow:0 8px 24px rgba(37,99,235,.12)}
+.kn{font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--mu);margin-bottom:8px;font-weight:600}
+.kv{font-family:var(--fh);font-weight:800;font-size:32px;line-height:1;color:var(--tx)}
+.ks{font-size:11px;color:var(--mu);margin-top:5px}
+.kd .kv{color:var(--dg)}
+.dr{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+@media(max-width:900px){.dr{grid-template-columns:1fr}}
+
+/* BADGES */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.3px}
+.bok{background:rgba(16,185,129,.12);color:#0fa968;border:1px solid rgba(16,185,129,.2)}
+.bnc{background:rgba(229,62,62,.10);color:var(--dg);border:1px solid rgba(229,62,62,.2)}
+.bgr{background:rgba(107,133,168,.10);color:var(--mu);border:1px solid rgba(107,133,168,.2)}
+.bpu{background:rgba(124,58,237,.1);color:var(--pu);border:1px solid rgba(124,58,237,.2)}
+.bsk{background:rgba(14,165,233,.1);color:var(--sky);border:1px solid rgba(14,165,233,.2)}
+
+/* TABLE */
+.tb-bar{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.tb-bar input[type=text]{flex:1;min-width:180px;background:var(--sf);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12.5px;padding:9px 14px;border-radius:var(--rs);outline:none;transition:border-color .15s}
+.tb-bar input:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.twrap{overflow-x:auto;border-radius:var(--r);border:1.5px solid var(--bd);box-shadow:var(--sh2)}
+table{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--sf)}
+th{background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;padding:11px 14px;text-align:left;border-bottom:1.5px solid var(--bd);white-space:nowrap;font-weight:700}
+td{padding:10px 14px;border-bottom:1px solid var(--bd2);vertical-align:middle;white-space:nowrap;color:var(--tx)}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--sf2)}
+
+/* MODAL */
+.mov{position:fixed;inset:0;z-index:200;background:rgba(15,36,71,.45);display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.mov.open{display:flex;animation:fi .18s}
+.modal{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);width:min(620px,96vw);max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(15,36,71,.2)}
+.mh{padding:18px 24px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--sf);z-index:1}
+.mt{font-family:var(--fh);font-size:17px;font-weight:700;color:var(--tx)}
+.mx{background:none;border:none;color:var(--mu);cursor:pointer;font-size:20px;line-height:1;padding:2px 6px;border-radius:6px;transition:all .15s}
+.mx:hover{color:var(--tx);background:var(--sf2)}
+.mb{padding:24px}
+.mf{padding:14px 24px;border-top:1.5px solid var(--bd);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--sf)}
+
+/* FORMS */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg .full{grid-column:1/-1}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mu);font-weight:600}
+.field input,.field select,.field textarea{width:100%;background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12.5px;padding:9px 12px;border-radius:var(--rs);outline:none;transition:all .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:var(--sf)}
+.field textarea{resize:vertical;min-height:66px}
+.field select option{background:var(--sf)}
+.fro{background:var(--sf3);border:1.5px solid var(--bd);border-radius:var(--rs);padding:9px 12px;font-size:12.5px;min-height:38px}
+.fro.nc{color:var(--dg);font-weight:700;border-color:rgba(229,62,62,.3);background:rgba(229,62,62,.05)}
+.fro.ok{color:var(--gn);font-weight:700;border-color:rgba(16,185,129,.3);background:rgba(16,185,129,.05)}
+.fro.inf{color:var(--bl)}
+.nca{background:rgba(229,62,62,.06);border:1.5px solid rgba(229,62,62,.2);border-radius:var(--rs);padding:11px 14px;font-size:12.5px;color:var(--dg);font-weight:500}
+.rh{background:linear-gradient(135deg,rgba(37,99,235,.06),rgba(14,165,233,.06));border:1.5px solid rgba(37,99,235,.15);border-radius:var(--rs);padding:11px 14px;margin-bottom:16px;font-size:12px;color:var(--bl);font-weight:500}
+
+/* APPAREIL MANAGER */
+.app-mgr{background:var(--sf2);border:1.5px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:4px}
+.app-mgr-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:10px;font-weight:600}
+.app-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;min-height:30px}
+.app-tag{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,rgba(37,99,235,.08),rgba(14,165,233,.08));border:1px solid rgba(37,99,235,.2);border-radius:20px;padding:4px 12px;font-size:11.5px;color:var(--bl);font-weight:500}
+.app-tag .rm{background:none;border:none;color:var(--mu);cursor:pointer;font-size:12px;line-height:1;padding:0 2px}
+.app-tag .rm:hover{color:var(--dg)}
+.app-add-row{display:flex;gap:8px}
+.app-add-row input{flex:1;background:var(--sf);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:8px 12px;border-radius:var(--rs);outline:none;transition:all .15s}
+.app-add-row input:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+
+/* TIME PICKER */
+.tpw{position:relative;display:flex;align-items:center;gap:6px}
+.tpw input{flex:1}
+.tpb{background:var(--sf2);border:1.5px solid var(--bd);color:var(--mu);border-radius:var(--rs);padding:8px 10px;cursor:pointer;font-size:14px;flex-shrink:0;transition:all .15s;line-height:1}
+.tpb:hover{color:var(--bl);border-color:var(--bl)}
+.cpop{position:absolute;top:calc(100% + 6px);left:0;z-index:300;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px 20px;box-shadow:0 8px 32px rgba(37,99,235,.15);display:none;min-width:220px}
+.cpop.open{display:block;animation:fi .15s}
+.cdials{display:flex;gap:10px;align-items:center;justify-content:center}
+.cdial{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cdial label{font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.cnum{font-family:var(--fh);font-weight:800;font-size:30px;min-width:52px;text-align:center;line-height:1;color:var(--tx)}
+.cbcol{display:flex;flex-direction:column;gap:3px}
+.cb{background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx);border-radius:6px;padding:2px 12px;cursor:pointer;font-size:16px;line-height:1.4;transition:all .15s}
+.cb:hover{border-color:var(--bl);color:var(--bl)}
+.csep{font-size:28px;font-weight:800;color:var(--mu);align-self:center;padding-bottom:12px}
+.capl{margin-top:12px;width:100%}
+
+/* TEAM PANEL */
+.team-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:4px}
+.team-card{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);padding:18px;box-shadow:var(--sh2);transition:all .18s;position:relative}
+.team-card:hover{transform:translateY(-2px);box-shadow:var(--sh)}
+.team-card-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.team-avatar{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+.team-avatar.admin{background:linear-gradient(135deg,#d97706,#dc2626)}
+.team-avatar.employe{background:linear-gradient(135deg,#0ea5e9,#2563eb)}
+.team-name{font-weight:700;font-size:14px;color:var(--tx)}
+.team-id{font-family:var(--fm);font-size:11px;color:var(--mu);margin-top:1px}
+.team-entreprise{font-size:11px;color:var(--mu);margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bd2)}
+.team-actions{display:flex;gap:6px}
+
+/* LOG PANEL */
+.log-stat-bar{display:flex;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.log-stat{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--r);padding:14px 18px;flex:1;min-width:120px;box-shadow:var(--sh2)}
+.log-stat-v{font-family:var(--fh);font-weight:800;font-size:28px;color:var(--tx)}
+.log-stat-l{font-size:10.5px;color:var(--mu);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.8px}
+.log-filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.log-filters select,.log-filters input{background:var(--sf);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:8px 12px;border-radius:var(--rs);outline:none;transition:border-color .15s}
+.log-filters select:focus,.log-filters input:focus{border-color:var(--bl)}
+.log-entry{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd2)}
+.log-entry:last-child{border-bottom:none}
+.log-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.log-dot.add{background:var(--gn)}.log-dot.update{background:var(--bl)}.log-dot.delete{background:var(--dg)}.log-dot.resolve{background:var(--mint)}.log-dot.login{background:var(--pu)}
+.log-main{flex:1}
+.log-title{font-weight:700;font-size:12.5px;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.log-badge-module{background:rgba(37,99,235,.1);color:var(--bl);border-radius:20px;padding:2px 8px;font-size:10.5px;font-weight:600}
+.log-meta{margin-top:3px;font-size:11px;color:var(--mu)}
+.log-ts{font-size:10.5px;color:var(--mu);flex-shrink:0;font-family:var(--fm)}
+
+/* PURGE PANEL */
+.purge-box{background:linear-gradient(135deg,rgba(220,38,38,.05),rgba(124,58,237,.04));border:2px solid rgba(220,38,38,.2);border-radius:var(--r);padding:28px 32px;max-width:600px;margin:0 auto;text-align:center}
+.purge-icon{font-size:48px;margin-bottom:16px}
+.purge-title{font-family:var(--fh);font-weight:800;font-size:20px;color:var(--tx);margin-bottom:10px}
+.purge-desc{color:var(--mu);font-size:13px;line-height:1.7;margin-bottom:24px}
+.purge-steps{text-align:left;background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs);padding:16px 20px;margin-bottom:24px;font-size:12.5px;line-height:2}
+.purge-steps li{margin-left:16px;color:var(--tx)}
+.purge-confirm-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:20px}
+.purge-confirm-row input{font-family:var(--fm);font-size:13px;padding:8px 14px;border:1.5px solid var(--bd);border-radius:var(--rs);outline:none;transition:border-color .15s;width:220px;text-align:center}
+.purge-confirm-row input:focus{border-color:var(--dg);box-shadow:0 0 0 3px rgba(229,62,62,.1)}
+.purge-progress{background:var(--sf3);border:1.5px solid var(--bd);border-radius:var(--rs);padding:14px 18px;margin-bottom:16px;display:none}
+.purge-progress.on{display:block}
+.purge-progress-bar{height:8px;background:var(--bd);border-radius:4px;overflow:hidden;margin-top:8px}
+.purge-progress-fill{height:100%;background:linear-gradient(90deg,var(--bl),var(--sky));border-radius:4px;transition:width .4s ease;width:0%}
+
+/* MISC */
+.ld{display:flex;align-items:center;justify-content:center;padding:36px;color:var(--mu);gap:10px}
+.sp{width:17px;height:17px;border:2px solid var(--bd);border-top-color:var(--bl);border-radius:50%;animation:lspin .7s linear infinite}
+.empty{text-align:center;padding:44px 20px;color:var(--mu)}
+.ei{font-size:36px;margin-bottom:10px}
+.nc-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd2)}
+.nc-row:last-child{border-bottom:none}
+.toast-c{position:fixed;bottom:20px;right:20px;z-index:999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--sf);border:1.5px solid var(--bd);border-radius:var(--rs);padding:11px 15px;font-size:12px;box-shadow:var(--sh);display:flex;align-items:center;gap:8px;animation:tsi .2s ease;max-width:320px}
+.toast.success{border-left:3px solid var(--gn)}.toast.error{border-left:3px solid var(--dg)}.toast.info{border-left:3px solid var(--bl)}
+@keyframes tsi{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="login-screen">
+  <svg class="thdeco" style="right:8%;top:15%;width:100px" viewBox="0 0 60 180" fill="none"><rect x="22" y="10" width="16" height="120" rx="8" fill="#0ea5e9"/><rect x="26" y="14" width="8" height="80" rx="4" fill="rgba(255,255,255,.5)"/><circle cx="30" cy="148" r="18" fill="#0ea5e9"/><circle cx="30" cy="148" r="12" fill="rgba(255,255,255,.5)"/><rect x="28" y="60" width="12" height="4" rx="2" fill="rgba(255,255,255,.6)"/><rect x="28" y="75" width="12" height="4" rx="2" fill="rgba(255,255,255,.6)"/></svg>
+  <svg class="thdeco" style="left:5%;bottom:22%;width:72px;animation-delay:2s" viewBox="0 0 60 180" fill="none"><rect x="22" y="10" width="16" height="120" rx="8" fill="#1d4ed8"/><rect x="26" y="14" width="8" height="55" rx="4" fill="rgba(255,255,255,.5)"/><circle cx="30" cy="148" r="18" fill="#1d4ed8"/><circle cx="30" cy="148" r="12" fill="rgba(255,255,255,.4)"/></svg>
+  <div class="lwaves"><svg viewBox="0 0 1440 140" xmlns="http://www.w3.org/2000/svg"><path fill="rgba(14,165,233,.1)" d="M0,50 C240,100 480,0 720,50 C960,100 1200,0 1440,50 L1440,140 L0,140 Z"/><path fill="rgba(29,78,216,.06)" d="M0,75 C360,120 720,25 1080,75 C1260,100 1380,55 1440,75 L1440,140 L0,140 Z"/></svg></div>
+  <div class="lcard-wrap">
+    <div class="lcard">
+      <div class="llogozone">
+        <div class="llogomark">
+          <svg class="llogosvg" viewBox="0 0 38 38" fill="none">
+            <path d="M19 4C19 4 8 18 8 24C8 30.627 13 36 19 36C25 36 30 30.627 30 24C30 18 19 4 19 4Z" fill="white" fill-opacity=".95"/>
+            <rect x="16" y="18" width="6" height="14" rx="2" fill="#0ea5e9"/>
+            <rect x="12" y="22" width="14" height="6" rx="2" fill="#0ea5e9"/>
+            <ellipse cx="14" cy="20" rx="2.5" ry="4" fill="rgba(255,255,255,.6)" transform="rotate(-20 14 20)"/>
+          </svg>
+        </div>
+        <div class="lbrand">Easy<span>Hygie</span></div>
+        <div class="ltag">Pack Hygiène · HACCP</div>
+      </div>
+      <div class="lfield">
+        <label>Identifiant</label>
+        <input type="text" id="l-id" placeholder="Votre identifiant…" autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('l-pwd').focus()"/>
+      </div>
+      <div class="lfield">
+        <label>Mot de passe</label>
+        <div class="lpw">
+          <input type="password" id="l-pwd" placeholder="••••••••" autocomplete="current-password" style="padding-right:44px" onkeydown="if(event.key==='Enter')doLogin()"/>
+          <button class="lpwbtn" id="l-eye" onclick="togglePwd()" type="button">👁</button>
+        </div>
+      </div>
+      <button class="lbtn" id="l-btn" onclick="doLogin()">
+        <span class="ltxt" id="l-txt">🔐 &nbsp;Se connecter</span>
+        <span class="lsp" id="l-sp"><div class="lspinner"></div>Vérification…</span>
+      </button>
+      <div class="lerr" id="l-err"></div>
+      <div class="lok" id="l-ok">✅ Connexion réussie…</div>
+    </div>
+    <div class="lfooter">EasyHygie © 2026 · Pack Hygiène HACCP</div>
+  </div>
+</div>
+
+<!-- ═══ APP ═══ -->
+<div id="app-screen">
+  <div class="bg-bubbles" id="bubbles"></div>
+  <div class="app">
+    <aside>
+      <div class="logo">
+        <div class="logo-wrap">
+          <div class="logo-icon">
+            <svg class="logo-svg" viewBox="0 0 38 38" fill="none">
+              <path d="M19 4C19 4 8 18 8 24C8 30.627 13 36 19 36C25 36 30 30.627 30 24C30 18 19 4 19 4Z" fill="white" fill-opacity=".95"/>
+              <rect x="16" y="18" width="6" height="14" rx="2" fill="#0ea5e9"/>
+              <rect x="12" y="22" width="14" height="6" rx="2" fill="#0ea5e9"/>
+            </svg>
+          </div>
+          <div class="logo-text">Easy<span>Hygie</span></div>
+        </div>
+        <div class="logo-sub">Pack Hygiène · HACCP</div>
+      </div>
+      <nav>
+        <div class="nsec">Général</div>
+        <div class="ni active" data-p="dashboard" onclick="showPanel('dashboard',this)"><span class="ic">📊</span>Tableau de bord</div>
+        <div class="nsec">Modules</div>
+        <div class="ni" data-p="reception" onclick="showPanel('reception',this)"><span class="ic">🚚</span>Réception<span class="nbadge" id="b-reception"></span></div>
+        <div class="ni" data-p="froid" onclick="showPanel('froid',this)"><span class="ic">❄️</span>Contrôle Froid<span class="nbadge" id="b-froid"></span></div>
+        <div class="ni" data-p="huiles" onclick="showPanel('huiles',this)"><span class="ic">🛢</span>Huiles<span class="nbadge" id="b-huiles"></span></div>
+        <div class="ni" data-p="refroidissement" onclick="showPanel('refroidissement',this)"><span class="ic">🌡</span>Refroidissement<span class="nbadge" id="b-refroidissement"></span></div>
+        <div class="ni" data-p="congelation" onclick="showPanel('congelation',this)"><span class="ic">🧊</span>Congélation<span class="nbadge" id="b-congelation"></span></div>
+        <div class="ni" data-p="remise" onclick="showPanel('remise',this)"><span class="ic">♨️</span>Remise en T°<span class="nbadge" id="b-remise"></span></div>
+        <div class="nsec">Outils</div>
+        <div class="ni" data-p="logs" onclick="showPanel('logs',this)"><span class="ic">📋</span>Journaux</div>
+        <div class="ni ni-admin-only" id="ni-team" data-p="team" onclick="showPanel('team',this)"><span class="ic">👥</span>Équipe</div>
+        <div class="ni ni-admin-only" id="ni-loginlogs" data-p="loginlogs" onclick="showPanel('loginlogs',this)"><span class="ic">🔑</span>Connexions</div>
+        <div class="ni ni-admin-only" id="ni-purge" data-p="purge" onclick="showPanel('purge',this)"><span class="ic">🗄</span>Clôture &amp; Export</div>
+      </nav>
+      <div class="thermo-widget">
+        <div class="thermo-title">🌡 Températures</div>
+        <div id="thermo-rows"><div style="font-size:10px;color:rgba(255,255,255,.3)">Chargement…</div></div>
+      </div>
+      <div class="user-card">
+        <div class="user-avatar" id="ua"></div>
+        <div class="user-info">
+          <div class="user-nom" id="un"></div>
+          <div class="user-id" id="uid"></div>
+          <span class="user-statut" id="ustatut"></span>
+        </div>
+        <button class="user-logout" onclick="doLogout()" title="Déconnexion">⏻</button>
+      </div>
+      <div class="sver">EasyHygie v4 · 2026</div>
+    </aside>
+
+    <main>
+      <div class="topbar">
+        <div class="ptitle" id="ptitle">📊  Tableau de bord</div>
+        <button class="btn bg sm" onclick="refreshCurrent()">↻ Actualiser</button>
+      </div>
+      <div class="content">
+
+        <!-- DASHBOARD -->
+        <div class="panel active" id="panel-dashboard">
+          <div class="kgrid" id="kgrid"><div class="ld"><div class="sp"></div>Chargement…</div></div>
+          <div class="dr">
+            <div class="card"><div class="card-h"><div class="card-t">🚨 NC ouvertes</div></div><div class="card-b" id="nc-list"><div class="ld"><div class="sp"></div></div></div></div>
+            <div class="card"><div class="card-h"><div class="card-t">📈 Conformité par module</div></div><div class="card-b" id="mod-bars"><div class="ld"><div class="sp"></div></div></div></div>
+          </div>
+          <div class="dr" style="margin-top:18px">
+            <div class="card" style="grid-column:1/-1">
+              <div class="card-h">
+                <div class="card-t">🌡 Courbes Contrôle Froid</div>
+                <select id="chart-sel" style="background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:6px 10px;border-radius:var(--rs);cursor:pointer;outline:none" onchange="renderFroidChart()"><option value="">Tous les appareils</option></select>
+              </div>
+              <div class="card-b" style="height:260px;position:relative"><canvas id="froid-chart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODULES (inchangés) -->
+        <div class="panel" id="panel-reception">
+  <!-- VUE LISTE BL -->
+  <div id="rec-list-view">
+    <div class="tb-bar">
+      <input type="text" placeholder="Rechercher BL, fournisseur…" oninput="filterBL(this.value)"/>
+      <button class="btn bp" onclick="openAddBL()">＋ Nouveau BL</button>
+      <button class="btn bg" onclick="loadModule('reception')">↻</button>
+    </div>
+    <div class="twrap">
+      <table id="table-reception">
+        <thead>
+          <tr>
+            <th>ID BL</th>
+            <th>Date</th>
+            <th>Fournisseur</th>
+            <th>N° BL</th>
+            <th>Produits</th>
+            <th>Conformité</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+        <div class="panel" id="panel-froid"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('froid',this.value)"/><button class="btn bp" onclick="openAdd('froid')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('froid')">↻</button></div><div class="twrap"><table id="table-froid"><thead><tr><th>ID</th><th>Appareil</th><th>Type</th><th>Date</th><th>Heure</th><th>T°C Mesurée</th><th>T°C Cible</th><th>T°C Crit.</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-huiles"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('huiles',this.value)"/><button class="btn bp" onclick="openAdd('huiles')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('huiles')">↻</button></div><div class="twrap"><table id="table-huiles"><thead><tr><th>ID</th><th>Date</th><th>Appareil</th><th>Chimique</th><th>Visuel</th><th>Conformité</th><th>Visa</th><th>Action</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="10"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-refroidissement"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('refroidissement',this.value)"/><button class="btn bp" onclick="openAdd('refroidissement')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('refroidissement')">↻</button></div><div class="rh">🔹 Règle : <strong>+63°C → +10°C en ≤ 2h</strong></div><div class="twrap"><table id="table-refroidissement"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-congelation"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('congelation',this.value)"/><button class="btn bp" onclick="openAdd('congelation')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('congelation')">↻</button></div><div class="rh">🔹 Règle : <strong>+10°C → -18°C à cœur, idéalement &lt;4h</strong></div><div class="twrap"><table id="table-congelation"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-remise"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('remise',this.value)"/><button class="btn bp" onclick="openAdd('remise')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('remise')">↻</button></div><div class="rh">🔹 Règle : <strong>+3°C → ≥+63°C en ≤ 1h</strong> · Ne jamais réchauffer plusieurs fois</div><div class="twrap"><table id="table-remise"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+
+        <!-- JOURNAUX HACCP -->
+        <div class="panel" id="panel-logs">
+          <div class="log-stat-bar">
+            <div class="log-stat"><div class="log-stat-v" id="ls-total">—</div><div class="log-stat-l">Actions totales</div></div>
+            <div class="log-stat"><div class="log-stat-v" id="ls-adds" style="color:var(--gn)">—</div><div class="log-stat-l">Ajouts</div></div>
+            <div class="log-stat"><div class="log-stat-v" id="ls-nc" style="color:var(--wn)">—</div><div class="log-stat-l">NC créées</div></div>
+            <div class="log-stat"><div class="log-stat-v" id="ls-resolved" style="color:var(--mint)">—</div><div class="log-stat-l">NC résolues</div></div>
+          </div>
+          <div class="log-filters">
+            <select id="log-filter-module" onchange="renderLogs()"><option value="">Tous les modules</option><option value="reception">Réception</option><option value="froid">Froid</option><option value="huiles">Huiles</option><option value="refroidissement">Refroidissement</option><option value="congelation">Congélation</option><option value="remise">Remise en T°</option></select>
+            <select id="log-filter-action" onchange="renderLogs()"><option value="">Toutes les actions</option><option value="add">Ajout</option><option value="update">Modification</option><option value="delete">Suppression</option><option value="resolveNC">Résolution NC</option></select>
+            <input type="text" placeholder="Rechercher…" id="log-search" oninput="renderLogs()" style="flex:1;min-width:160px"/>
+            <button class="btn bg sm" onclick="S.logs=[];renderLogs()" id="btn-vider-logs" style="display:none">🗑 Vider</button>
+          </div>
+          <div class="card">
+            <div class="card-h"><div class="card-t">📋 Journal d'activité</div><span id="log-count" style="font-size:11px;color:var(--mu)"></span></div>
+            <div class="card-b" style="padding:0"><div id="log-timeline" style="padding:14px 20px;max-height:600px;overflow-y:auto"><div class="ld"><div class="sp"></div></div></div></div>
+          </div>
+        </div>
+
+        <!-- ÉQUIPE (admin only) -->
+        <div class="panel" id="panel-team">
+          <div class="tb-bar">
+            <button class="btn bp" onclick="openAddUser()">＋ Ajouter un membre</button>
+            <button class="btn bg" onclick="loadTeam()">↻ Actualiser</button>
+          </div>
+          <div class="team-grid" id="team-grid"><div class="ld"><div class="sp"></div>Chargement…</div></div>
+        </div>
+
+        <!-- CONNEXIONS (admin only) -->
+        <div class="panel" id="panel-loginlogs">
+          <div class="log-filters">
+  <input type="text" placeholder="Rechercher…" id="ll-search" oninput="renderLoginLogs()" style="flex:1;min-width:160px"/>
+  <button class="btn bg sm" onclick="loadLoginLogs()">↻ Actualiser</button>
+</div>
+          <div class="card">
+            <div class="card-h"><div class="card-t">🔑 Journal des connexions</div><span id="ll-count" style="font-size:11px;color:var(--mu)"></span></div>
+            <div class="card-b" style="padding:0">
+              <div class="twrap" style="border:none;border-radius:0;box-shadow:none">
+                <table id="table-loginlogs">
+                  <thead><tr><th>Date/Heure</th><th>Id</th><th>Nom</th><th>Statut</th><th>Modules consultés</th><th></th></tr></thead>
+                  <tbody><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CLÔTURE & EXPORT (admin only) -->
+        <div class="panel" id="panel-purge">
+          <div class="purge-box">
+            <div class="purge-icon">🗄</div>
+            <div class="purge-title">Clôture de période & Export CSV</div>
+            <div class="purge-desc">
+              Cette opération exporte <strong>l'intégralité de toutes les feuilles HACCP</strong> en un fichier CSV horodaté,
+              puis <strong>efface toutes les données</strong> pour repartir sur une période vierge.
+              La traçabilité est conservée via le fichier CSV téléchargé.
+            </div>
+            <div class="purge-steps">
+              <ol>
+                <li>Toutes les feuilles (Réception, Froid, Huiles, Refroidissement, Congélation, Remise en T°) sont exportées en CSV</li>
+                <li>Le fichier CSV est téléchargé sur votre appareil avant toute suppression</li>
+                <li>Un log de clôture est enregistré dans le journal des connexions</li>
+                <li>Toutes les lignes de données sont effacées du Google Sheets (les en-têtes sont conservés)</li>
+              </ol>
+            </div>
+            <div class="purge-confirm-row">
+              <input type="text" id="purge-confirm-input" placeholder="Taper CLOTURER pour confirmer"/>
+            </div>
+            <div class="purge-progress" id="purge-progress">
+              <div id="purge-progress-text" style="font-size:12px;color:var(--mu)">Export en cours…</div>
+              <div class="purge-progress-bar"><div class="purge-progress-fill" id="purge-fill"></div></div>
+            </div>
+            <button class="btn bdanger" style="width:100%;justify-content:center;font-size:14px;padding:14px" onclick="doPurge()">
+              ⚠️ Exporter et clôturer la période
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mov" id="mov" onclick="clov(event)">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="mt"></div><button class="mx" onclick="clom()">✕</button></div>
+    <div class="mb" id="mb"></div>
+    <div class="mf" id="mf"></div>
+  </div>
+</div>
+<div class="toast-c" id="tc"></div>
+
+<script>
+// ════════════════════════════════════════════
+//  ⚠️  COLLER L'URL DU SCRIPT MASTER ICI
+// ════════════════════════════════════════════
+const MASTER_URL = 'https://script.google.com/macros/s/AKfycby0nIuSF0f5llrc4ncyhBkzBFScMEgEmOVfydaz9LCp31CQd94NrfM937kCWOCfHRdfcw/exec';
+// ════════════════════════════════════════════
+
+/* ── SESSION ── */
+let _sess=null, API_URL='';
+
+function loadSession(){
+  const raw=sessionStorage.getItem('easyhy_sess');
+  if(!raw)return false;
+  try{_sess=JSON.parse(raw);API_URL=_sess.apiUrl||'';return !!_sess.apiUrl;}
+  catch(e){return false;}
+}
+function saveSession(nom,id,apiUrl,statut,entreprise,mdp){
+  _sess={nom,id,apiUrl,statut:statut||'employe',entreprise:entreprise||'',Mdp:mdp||''};
+  API_URL=apiUrl;
+  sessionStorage.setItem('easyhy_sess',JSON.stringify(_sess));
+}
+function clearSession(){sessionStorage.removeItem('easyhy_sess');_sess=null;API_URL='';}
+const isAdmin=()=>_sess?.statut==='admin';
+
+/* ── SHOW/HIDE ── */
+function showLogin(){
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app-screen').classList.remove('visible');
+  spawnLoginBubbles();
+}
+function showApp(){
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.add('visible');
+  // User info
+  const av=document.getElementById('ua'),un=document.getElementById('un'),
+        uid=document.getElementById('uid'),us=document.getElementById('ustatut');
+  if(av){av.textContent=(_sess.nom||'?')[0].toUpperCase();av.className='user-avatar '+(_sess.statut==='admin'?'admin':'employe');}
+  if(un)un.textContent=_sess.nom||'';
+  if(uid)uid.textContent='ID : '+(_sess.id||'');
+  if(us){us.textContent=_sess.statut||'employe';us.className='user-statut '+(_sess.statut==='admin'?'admin':'employe');}
+  // Show admin nav items
+  document.querySelectorAll('.ni-admin-only').forEach(el=>el.classList.toggle('visible',isAdmin()));
+const btnVider=document.getElementById('btn-vider-logs');
+if(btnVider)btnVider.style.display=isAdmin()?'':'none';
+  initBubbles();
+  loadAllAppareils().then(()=>loadDashboard());
+  // Log connexion
+  logLogin();
+}
+
+/* ── LOGIN ── */
+function togglePwd(){const i=document.getElementById('l-pwd'),b=document.getElementById('l-eye');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'👁':'🙈';}
+function lLoad(on){document.getElementById('l-btn').disabled=on;document.getElementById('l-txt').style.display=on?'none':'inline-flex';document.getElementById('l-sp').classList.toggle('on',on);}
+function lErr(m){const e=document.getElementById('l-err');e.textContent=m;e.classList.add('on');document.getElementById('l-ok').classList.remove('on');}
+function lOk(){document.getElementById('l-ok').classList.add('on');document.getElementById('l-err').classList.remove('on');}
+function lClear(){document.getElementById('l-err').classList.remove('on');document.getElementById('l-ok').classList.remove('on');}
+
+async function doLogin(){
+  lClear();
+  const id=document.getElementById('l-id').value.trim(),pwd=document.getElementById('l-pwd').value;
+  if(!id){lErr('Identifiant obligatoire');document.getElementById('l-id').focus();return;}
+  if(!pwd){lErr('Mot de passe obligatoire');document.getElementById('l-pwd').focus();return;}
+  if(!MASTER_URL||MASTER_URL.includes('COLLER')){lErr('URL Master non configurée dans le fichier');return;}
+  lLoad(true);
+  try{
+    const u=new URL(MASTER_URL);u.searchParams.set('action','getUsers');
+    const resp=await fetch(u,{redirect:'follow'});
+    if(!resp.ok)throw new Error('Erreur réseau ('+resp.status+')');
+    const json=await resp.json();
+    if(!json.ok)throw new Error(json.error||'Erreur serveur');
+    const users=json.data;
+    const user=users.find(u=>String(u.Id).trim()===id&&String(u.Mdp).trim()===pwd);
+    if(!user){lLoad(false);document.getElementById('l-pwd').value='';document.getElementById('l-pwd').focus();lErr('Identifiant ou mot de passe incorrect');return;}
+    if(!user.Webappurl||!user.Webappurl.trim()){lLoad(false);lErr('Aucune URL webapp pour ce compte. Contactez l\'administrateur.');return;}
+    saveSession(user.Nom,user.Id,user.Webappurl.trim(),user.Statut,user.Entreprise,user.Mdp);
+    lOk();
+    setTimeout(()=>showApp(),600);
+  }catch(e){lLoad(false);lErr('Erreur : '+e.message);}
+}
+
+/* ── LOGOUT ── */
+function doLogout(){if(!confirm('Se déconnecter ?'))return;clearSession();showLogin();}
+
+/* ── LOG CONNEXION → backend HACCP (API_URL) ── */
+async function logLogin(){
+  if(!API_URL)return;
+  try{
+    const u=new URL(API_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload',JSON.stringify({
+      action:'loginLog',userId:_sess.id,userName:_sess.nom,statut:_sess.statut,modules:''
+    }));
+    await fetch(u,{redirect:'follow'});
+  }catch(e){}
+}
+
+async function updateLoginModules(modules){
+  if(!API_URL)return;
+  try{
+    const u=new URL(API_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload',JSON.stringify({
+      action:'loginLog',userId:_sess.id,userName:_sess.nom,statut:_sess.statut,modules
+    }));
+    await fetch(u,{redirect:'follow'});
+  }catch(e){}
+}
+
+/* ── BULLES ── */
+function spawnLoginBubbles(){
+  const sc=document.getElementById('login-screen');
+  if(sc.querySelector('.lbubble'))return;
+  [22,16,34,12,28,18,40,10,26,20,14,32].forEach(s=>{
+    const b=document.createElement('div');b.className='lbubble';
+    b.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*92}%;bottom:-${s}px;--dx:${(Math.random()-.5)*120}px;animation:lrise ${7+Math.random()*10}s ${Math.random()*10}s linear infinite`;
+    sc.appendChild(b);
+  });
+}
+function initBubbles(){
+  const c=document.getElementById('bubbles');if(c.childElementCount>0)return;
+  for(let i=0;i<18;i++){const b=document.createElement('div');b.className='bubble';
+    const sz=20+Math.random()*60;
+    b.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;--drift:${(Math.random()-.5)*80}px;animation-duration:${8+Math.random()*14}s;animation-delay:${Math.random()*12}s`;
+    c.appendChild(b);}
+}
+
+/* ── STATE ── */
+const S={data:{},panel:'dashboard',chart:null,appareils:{froid:[],huiles:[]},logs:[],team:[],loginLogs:[],_visitedModules:new Set()};
+const MM={
+  reception:{label:'Réception',icon:'🚚',col:'#2563eb',col2:'#0ea5e9'},
+  froid:{label:'Contrôle Froid',icon:'❄️',col:'#0891b2',col2:'#67e8f9'},
+  huiles:{label:'Huiles',icon:'🛢',col:'#d97706',col2:'#fbbf24'},
+  refroidissement:{label:'Refroidissement',icon:'🌡',col:'#7c3aed',col2:'#a78bfa'},
+  congelation:{label:'Congélation',icon:'🧊',col:'#0369a1',col2:'#7dd3fc'},
+  remise:{label:'Remise en T°',icon:'♨️',col:'#dc2626',col2:'#fb923c'},
+};
+
+/* ── UTILS ── */
+const today=()=>new Date().toISOString().slice(0,10);
+const nowT=()=>{const n=new Date();return p2(n.getHours())+':'+p2(n.getMinutes());};
+const p2=v=>String(v).padStart(2,'0');
+const minBt=(a,b)=>{const[h1,m1]=a.split(':').map(Number);const[h2,m2]=b.split(':').map(Number);return(h2*60+m2)-(h1*60+m1);};
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+const tsNow=()=>new Date().toISOString().replace('T',' ').slice(0,19);
+
+/* ── API HACCP ── */
+async function GET(p){
+  if(!API_URL){toast('Non connecté','error');return null;}
+  try{const u=new URL(API_URL);Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,v));
+    const r=await fetch(u,{redirect:'follow'});const j=await r.json();if(!j.ok)throw new Error(j.error);return j.data;}
+  catch(e){toast('API: '+e.message,'error');return null;}
+}
+async function POST(b){
+  if(!API_URL){toast('Non connecté','error');return null;}
+  try{
+    const u=new URL(API_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload', JSON.stringify(b));
+    const r=await fetch(u,{redirect:'follow'});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error);
+    return j.data;
+  }catch(e){toast('API: '+e.message,'error');return null;}
+}
+
+/* ── API MASTER ── */
+async function MGET(p){
+  if(!MASTER_URL||MASTER_URL.includes('COLLER'))return null;
+  try{const u=new URL(MASTER_URL);Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,v));
+    const r=await fetch(u,{redirect:'follow'});const j=await r.json();if(!j.ok)throw new Error(j.error);return j.data;}
+  catch(e){toast('Master API: '+e.message,'error');return null;}
+}
+async function MPOST(b){
+  if(!MASTER_URL||MASTER_URL.includes('COLLER'))return null;
+  try{
+    const u=new URL(MASTER_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload', JSON.stringify({...b,callerId:_sess.id,callerMdp:_sess.Mdp||''}));
+    const r=await fetch(u,{redirect:'follow'});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error);
+    return j.data;
+  }
+  catch(e){toast('Master API: '+e.message,'error');return null;}
+}
+
+/* ── NAV ── */
+const _visitedMods=new Set();
+function showPanel(id,el){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  S.panel=id;
+  const m=MM[id];
+  document.getElementById('ptitle').textContent=m?m.icon+'  '+m.label:{dashboard:'📊  Tableau de bord',logs:'📋  Journaux',team:'👥  Équipe',loginlogs:'🔑  Connexions',purge:'🗄  Clôture & Export'}[id]||id;
+  if(id==='dashboard')loadDashboard();
+  else if(id==='logs')loadAndRenderLogs();
+  else if(id==='team')loadTeam();
+  else if(id==='loginlogs')loadLoginLogs();
+  else if(id==='purge'){/* static */}
+  else{
+    loadModule(id);
+    if(MM[id]){_visitedMods.add(MM[id].label);}
+  }
+}
+function refreshCurrent(){if(S.panel==='dashboard')loadDashboard();else if(S.panel==='logs')renderLogs();else if(S.panel==='team')loadTeam();else if(S.panel==='loginlogs')loadLoginLogs();else loadModule(S.panel);}
+
+/* ── APPAREILS ── */
+async function loadAppareils(t){const r=await GET({action:'getAppareils',type:t});if(r)S.appareils[t]=r.map(a=>a.nom);}
+async function loadAllAppareils(){await Promise.all([loadAppareils('froid'),loadAppareils('huiles')]);}
+
+/* ── THERMO ── */
+function updateThermoWidget(){
+  const froid=S.data.froid||[];const apps=[...new Set(froid.map(r=>r['Appareil']).filter(Boolean))];
+  const recent={};froid.forEach(r=>{const a=r['Appareil'];if(!a)return;if(!recent[a]||r['Date']>recent[a].Date)recent[a]=r;});
+  const html=apps.slice(0,4).map(a=>{
+    const r=recent[a];if(!r)return'';const t=parseFloat(r['T°C entrée']);if(isNaN(t))return'';
+    const tp=r['Type_controle'];const max=tp==='Frigo'?10:0;const min=tp==='Frigo'?-5:-25;
+    const pct=Math.min(100,Math.max(0,((t-min)/(max-min))*100));
+    const crit=tp==='Frigo'?4:-16;const col=t>crit?'#e53e3e':t>(crit-2)?'#d97706':'#0ea5e9';
+    return`<div class="thermo-row"><div style="font-size:10px;color:rgba(255,255,255,.5);min-width:70px;overflow:hidden;text-overflow:ellipsis">${esc(a)}</div><div class="thermo-bar-wrap"><div class="thermo-bar" style="width:${pct}%;background:${col}"></div></div><div class="thermo-label" style="color:${col}">${t.toFixed(1)}°</div></div>`;
+  }).join('');
+  document.getElementById('thermo-rows').innerHTML=html||'<div style="font-size:10px;color:rgba(255,255,255,.3)">Aucun relevé</div>';
+}
+
+/* ── DASHBOARD ── */
+async function loadDashboard(){
+  document.getElementById('kgrid').innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
+  const dash=await GET({action:'getDashboard'});if(!dash)return;
+  let tnc=0,tnr=0,tok=0;Object.values(dash).forEach(m=>{tnc+=m.nonConforme;tnr+=m.nonRegle;tok+=m.conforme;});
+  const tot=tok+tnc,pct=tot>0?Math.round(tok/tot*100):100;
+  document.getElementById('kgrid').innerHTML=`
+    <div class="kc ${tnr>0?'kd':''}" style="--cc:#e53e3e;--cc2:#fc8181"><div class="kn">NC non-réglées</div><div class="kv">${tnr}</div><div class="ks">ouvertes</div></div>
+    <div class="kc" style="--cc:#d97706;--cc2:#fbbf24"><div class="kn">Non-conformités</div><div class="kv">${tnc}</div><div class="ks">total</div></div>
+    <div class="kc" style="--cc:#0fa968;--cc2:#34d399"><div class="kn">Conformes</div><div class="kv">${tok}</div><div class="ks">enregistrements</div></div>
+    <div class="kc" style="--cc:#2563eb;--cc2:#60a5fa"><div class="kn">Taux global</div><div class="kv">${pct}%</div><div class="ks">de conformité</div></div>
+    ${Object.entries(dash).map(([k,m])=>{const mt=MM[k];return`<div class="kc" style="--cc:${mt.col};--cc2:${mt.col2}" onclick="showPanel('${k}',document.querySelector('[data-p=${k}]'))"><div class="kn">${mt.icon} ${mt.label}</div><div class="kv">${m.total}</div><div class="ks">${m.nonConforme} NC · ${m.nonRegle} ouvert${m.nonRegle>1?'s':''}</div></div>`;}).join('')}`;
+  document.getElementById('mod-bars').innerHTML=Object.entries(dash).map(([k,m])=>{
+    const mt=MM[k];const pp=m.total>0?Math.round(m.conforme/m.total*100):100;const c=pp>80?'#0fa968':pp>50?'#d97706':'#e53e3e';
+    return`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span style="font-weight:600">${mt.icon} ${mt.label}</span><span style="color:var(--mu)">${m.conforme}/${m.total}</span></div><div style="height:7px;background:var(--sf3);border-radius:4px;overflow:hidden;border:1px solid var(--bd)"><div style="height:100%;width:${pp}%;background:${c};border-radius:4px;transition:width .6s ease"></div></div></div>`;
+  }).join('');
+  Object.entries(dash).forEach(([k,m])=>{const b=document.getElementById('b-'+k);if(b){b.textContent=m.nonRegle;b.classList.toggle('on',m.nonRegle>0);}});
+  renderNCOpen();await loadFroidChart();updateThermoWidget();
+}
+async function renderNCOpen(){
+  const list=document.getElementById('nc-list');
+  list.innerHTML='<div class="ld"><div class="sp"></div></div>';
+  const all=[];
+  // Réception : utiliser getBLGrouped
+  const bls=await GET({action:'getBLGrouped'});
+  if(bls)bls.filter(bl=>bl.conformite==='Non conforme'&&bl.nonRegle).forEach(bl=>all.push({ID_NC:bl.ID_BL,Date:bl.Date,_m:'reception'}));
+  // Autres modules
+  for(const k of Object.keys(MM).filter(k=>k!=='reception')){
+    const rows=await GET({action:'getAll',module:k});if(!rows)continue;
+    rows.filter(r=>String(r['Conformité']||'').toLowerCase()==='non conforme'&&(!r['Réglé/Non-réglé']||String(r['Réglé/Non-réglé']).toLowerCase().includes('non'))).forEach(r=>all.push({...r,_m:k}));
+  }
+  if(!all.length){list.innerHTML='<div class="empty"><div class="ei">✅</div><p>Aucune NC ouverte</p></div>';return;}
+  list.innerHTML=all.slice(0,12).map(r=>{const mt=MM[r._m];return`<div class="nc-row"><span style="font-size:18px">${mt.icon}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px">${r['ID_NC']||'?'}</div><div style="font-size:11px;color:var(--mu)">${mt.label} · ${r['Date']||''}</div></div><span class="badge bnc">Non-réglé</span><button class="btn bg sm" onclick="showPanel('${r._m}',document.querySelector('[data-p=${r._m}]'))">→</button></div>`;}).join('');
+}
+async function loadFroidChart(){
+  const rows=await GET({action:'getAll',module:'froid'});if(!rows){S.data.froid=[];return;}
+  S.data.froid=rows;
+  const apps=[...new Set(rows.map(r=>r['Appareil']).filter(Boolean))];
+  const sel=document.getElementById('chart-sel');
+  sel.innerHTML='<option value="">Tous les appareils</option>'+apps.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  renderFroidChart();updateThermoWidget();
+}
+function renderFroidChart(){
+  const rows=S.data.froid||[];const flt=document.getElementById('chart-sel').value;
+  const data=(flt?rows.filter(r=>r['Appareil']===flt):rows).filter(r=>r['Date']).sort((a,b)=>new Date(a['Date'])-new Date(b['Date']));
+  const apps=[...new Set(data.map(r=>r['Appareil']).filter(Boolean))];
+  const C=['#2563eb','#0891b2','#d97706','#dc2626','#7c3aed','#0369a1'];
+  const datasets=apps.map((app,i)=>({label:app,data:data.filter(r=>r['Appareil']===app).map(r=>({x:r['Date']+(r['Heure']?' '+r['Heure']:''),y:r['T°C entrée']!==''?parseFloat(r['T°C entrée']):null})).filter(p=>p.y!==null),borderColor:C[i%C.length],backgroundColor:C[i%C.length]+'18',borderWidth:2.5,pointRadius:4,tension:.4,fill:false}));
+  const ctx=document.getElementById('froid-chart').getContext('2d');
+  if(S.chart)S.chart.destroy();
+  S.chart=new Chart(ctx,{type:'line',data:{datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b85a8',font:{family:'Plus Jakarta Sans',size:11,weight:'600'}}},tooltip:{backgroundColor:'#fff',borderColor:'#d0e0f7',borderWidth:1.5,titleColor:'#0f2447',bodyColor:'#6b85a8',padding:10,cornerRadius:8}},scales:{x:{ticks:{color:'#6b85a8',font:{size:10}},grid:{color:'#e8f0fe'}},y:{ticks:{color:'#6b85a8',font:{size:10},callback:v=>v+'°C'},grid:{color:'#e8f0fe'}}}}});
+}
+
+/* ── MODULE TABLE ── */
+
+function renderTable(m,rows){
+  const tb=document.querySelector(`#table-${m} tbody`);
+  if(!rows||!rows.length){tb.innerHTML=`<tr><td colspan="20"><div class="empty"><div class="ei">📋</div><p>Aucun enregistrement</p></div></td></tr>`;return;}
+  tb.innerHTML=rows.map(r=>rowH(m,r)).join('');
+}
+function filterTable(m,q){const fq=q.toLowerCase();renderTable(m,fq?(S.data[m]||[]).filter(r=>Object.values(r).some(v=>String(v).toLowerCase().includes(fq))):S.data[m]||[]);}
+const CB=v=>{const s=String(v||'').toLowerCase();return s==='conforme'?`<span class="badge bok">Conforme</span>`:s==='non conforme'?`<span class="badge bnc">Non conf.</span>`:`<span class="badge bgr">${v||'—'}</span>`;};
+const RB=v=>{const s=String(v||'').toLowerCase();return s==='réglé'?`<span class="badge bok">Réglé</span>`:s.includes('non')?`<span class="badge bnc">Non-réglé</span>`:`<span class="badge bgr">—</span>`;};
+const RA=(m,id)=>`<div style="display:flex;gap:4px"><button class="btn bg sm" onclick='openDet("${m}","${esc(id)}")'>👁</button><button class="btn bg sm" onclick='openEdit("${m}","${esc(id)}")'>✏️</button><button class="btn bd2 sm" onclick='delRow("${m}","${esc(id)}")'>🗑</button></div>`;
+const TC=v=>v!==undefined&&v!==''?v+'°C':'—';
+function rowH(m,r){
+  const id=r['ID_NC']||'';const idc=`<code style="color:var(--bl);font-size:11px;background:rgba(37,99,235,.08);padding:2px 6px;border-radius:4px">${id}</code>`;
+  if(m==='reception')return`<tr><td>${idc}</td><td>${r['Date']||''}</td><td>${r['Fournisseur']||''}</td><td>${r['N° BL']||''}</td><td>${r['Type produit']||''}</td><td>${r['Produit']||''}</td><td>${TC(r['T°C entrée'])}</td><td>${TC(r['T°C cible'])}</td><td>${CB(r['Conformité'])}</td><td>${RB(r['Réglé/Non-réglé'])}</td><td>${RA(m,id)}</td></tr>`;
+  if(m==='froid')return`<tr><td>${idc}</td><td>${r['Appareil']||''}</td><td>${r['Type_controle']||''}</td><td>${r['Date']||''}</td><td>${r['Heure']||''}</td><td>${TC(r['T°C entrée'])}</td><td>${TC(r['T°C cible'])}</td><td>${TC(r['T°C critique'])}</td><td>${CB(r['Conformité'])}</td><td>${RB(r['Réglé/Non-réglé'])}</td><td>${RA(m,id)}</td></tr>`;
+  if(m==='huiles')return`<tr><td>${idc}</td><td>${r['Date']||''}</td><td>${r['Appareil']||''}</td><td>${CB(r['Contrôle chimique'])}</td><td>${CB(r['Contrôle visuel'])}</td><td>${CB(r['Conformité'])}</td><td>${r['Visa']||''}</td><td style="max-width:150px;overflow:hidden;text-overflow:ellipsis">${r['Action']||'—'}</td><td>${RB(r['Réglé/Non-réglé'])}</td><td>${RA(m,id)}</td></tr>`;
+  return`<tr><td>${idc}</td><td>${r['Date']||''}</td><td>${r['Produit']||''}</td><td>${r['H début']||''}</td><td>${TC(r['T°C début'])}</td><td>${r['H fin']||''}</td><td>${TC(r['T°C fin'])}</td><td>${r['Delta']||'—'}</td><td>${CB(r['Conformité'])}</td><td>${RB(r['Réglé/Non-réglé'])}</td><td>${RA(m,id)}</td></tr>`;
+}
+
+/* ── JOURNAUX HACCP ── */
+function formatTs(ts){
+  if(!ts)return'';
+  const s=String(ts);
+  if(/^\d{2}\/\d{2}\/\d{4}/.test(s))return s;
+  if(s.includes('GMT')){
+    const d=new Date(s);
+    if(!isNaN(d)){
+      // Soustraire le décalage UTC pour avoir l'heure locale réelle
+      const local=new Date(d.getTime()-8*3600000);
+      return p2(local.getDate())+'/'+p2(local.getMonth()+1)+'/'+local.getFullYear()+' '+p2(local.getHours())+':'+p2(local.getMinutes())+':'+p2(local.getSeconds());
+    }
+  }
+  if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/.test(s)){
+    const[date,time]=s.split(' ');const[y,m,d]=date.split('-');
+    return d+'/'+m+'/'+y+' '+time;
+  }
+  return s;
+}
+function renderLogs(){
+  const logs=S.logs,modF=document.getElementById('log-filter-module')?.value||'',actF=document.getElementById('log-filter-action')?.value||'',srch=(document.getElementById('log-search')?.value||'').toLowerCase();
+  let f=logs.filter(l=>{if(modF&&l.Module!==modF)return false;if(actF&&l.Action!==actF)return false;if(srch&&!Object.values(l).some(v=>String(v).toLowerCase().includes(srch)))return false;return true;});
+  document.getElementById('ls-total').textContent=logs.length;document.getElementById('ls-adds').textContent=logs.filter(l=>l.Action==='add').length;document.getElementById('ls-nc').textContent=logs.filter(l=>l['Conformité']==='Non conforme').length;document.getElementById('ls-resolved').textContent=logs.filter(l=>l.Action==='resolveNC').length;
+  document.getElementById('log-count').textContent=f.length+' entrée'+(f.length>1?'s':'');
+  const tl=document.getElementById('log-timeline');
+  if(!f.length){tl.innerHTML='<div class="empty"><div class="ei">📋</div><p>Aucun journal</p></div>';return;}
+  const dc={add:'add',update:'update',delete:'delete',resolveNC:'resolve'};
+  const al={add:'Ajout',update:'Modification',delete:'Suppression',resolveNC:'NC Résolue'};
+  const mi={reception:'🚚',froid:'❄️',huiles:'🛢',refroidissement:'🌡',congelation:'🧊',remise:'♨️'};
+  tl.innerHTML=f.map(l=>`<div class="log-entry"><div class="log-dot ${dc[l.Action]||'add'}"></div><div class="log-main"><div class="log-title">${al[l.Action]||l.Action}<span class="log-badge-module">${mi[l.Module]||''} ${MM[l.Module]?.label||l.Module}</span>${l.ID_NC?`<span style="color:var(--mu);font-size:11px">${l.ID_NC}</span>`:''}</div><div class="log-meta">${l['Conformité']?`<span class="badge ${l['Conformité']==='Non conforme'?'bnc':'bok'}" style="font-size:10px">${l['Conformité']}</span>`:''} ${l.User?`<span>${esc(l.User)}</span>`:''}</div></div><div class="log-ts">${formatTs(l.Timestamp||'')}</div></div>`).join('');
+}
+async function loadAndRenderLogs(){
+  const tl=document.getElementById('log-timeline');
+  tl.innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
+  const logs=await GET({action:'getActionLogs'});
+  if(logs){
+    S.logs=logs.map(l=>({
+      Timestamp:l.Timestamp,
+      User:l.UserNom,
+      Module:l.Module,
+      Action:l.Action,
+      ID_NC:l.ID_NC,
+      Conformité:l.Conformité,
+      Détails:l.Détails
+    }));
+  }
+  renderLogs();
+}
+async function sendLog(actionType, module, idNC, conformite, details){
+  S.logs.unshift({Timestamp:tsNow(),User:_sess?.nom||'',Module:module,Action:actionType,ID_NC:idNC||'',Conformité:conformite||'',Détails:details||''});
+  if(S.panel==='logs')renderLogs();
+  try{
+    const u=new URL(API_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload',JSON.stringify({
+      action:'addActionLog',
+      userId:_sess?.id||'',
+      userName:_sess?.nom||'',
+      module:module||'',
+      actionType:actionType||'',
+      idNC:idNC||'',
+      conformite:conformite||'',
+      details:details||''
+    }));
+    new Image().src = u.toString();
+  }catch(e){}
+}
+/* ── TEAM ── */
+async function loadTeam(){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  document.getElementById('team-grid').innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
+  const users=await MGET({action:'getUsers',callerId:_sess.id,callerMdp:_sess.Mdp||''});
+  if(!users)return;
+  S.team=users;renderTeam(users);
+}
+function renderTeam(users){
+  if(!users.length){document.getElementById('team-grid').innerHTML='<div class="empty"><div class="ei">👥</div><p>Aucun membre</p></div>';return;}
+  document.getElementById('team-grid').innerHTML=users.map(u=>{
+    const isAd=u.Statut==='admin';
+    return`<div class="team-card">
+      <div class="team-card-top">
+        <div class="team-avatar ${isAd?'admin':'employe'}">${(u.Nom||'?')[0].toUpperCase()}</div>
+        <div><div class="team-name">${esc(u.Nom)}</div><div class="team-id">${esc(u.Id)}</div></div>
+        <span class="badge ${isAd?'bpu':'bsk'}" style="margin-left:auto">${isAd?'Admin':'Employé'}</span>
+      </div>
+      ${u.Entreprise?`<div class="team-entreprise">🏢 ${esc(u.Entreprise)}</div>`:'<div class="team-entreprise" style="color:var(--mu);font-style:italic">—</div>'}
+      <div class="team-actions">
+        <button class="btn bg sm" style="flex:1" onclick="openEditUser('${esc(u.Id)}')">✏️ Modifier</button>
+        ${u.Id!==_sess.id?`<button class="btn bd2 sm" onclick="deleteUser('${esc(u.Id)}')">🗑</button>`:'<span class="btn bg sm" style="color:var(--mu);cursor:default;flex-shrink:0">(moi)</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openAddUser(){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  document.getElementById('mt').textContent='＋ Ajouter un membre';
+  document.getElementById('mb').innerHTML=userForm({});
+  document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="submitAddUser()">💾 Enregistrer</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+function openEditUser(id){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  const u=S.team.find(u=>u.Id===id);if(!u){toast('Introuvable','error');return;}
+  document.getElementById('mt').textContent='✏️ Modifier — '+esc(u.Nom);
+  document.getElementById('mb').innerHTML=userForm(u,true);
+  document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="submitEditUser('${esc(id)}')">💾 Enregistrer</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+function userForm(u={},isEdit=false){
+  return`<div class="fg">
+    <div class="field full"><label>Nom complet *</label><input type="text" name="Nom" value="${esc(u.Nom||'')}"/></div>
+    <div class="field"><label>Identifiant *</label><input type="text" name="Id" value="${esc(u.Id||'')}" ${isEdit?'readonly style="opacity:.6"':''}/></div>
+    <div class="field"><label>Mot de passe *</label><input type="text" name="Mdp" value="${esc(u.Mdp||'')}" placeholder="${isEdit?'Laisser vide = inchangé':''}"/></div>
+    <div class="field"><label>Statut *</label>
+      <select name="Statut">
+        <option value="employe" ${u.Statut==='employe'||!u.Statut?'selected':''}>Employé</option>
+        <option value="admin" ${u.Statut==='admin'?'selected':''}>Administrateur</option>
+      </select></div>
+    <input type="hidden" name="Entreprise" value="${u.Entreprise||_sess.entreprise||''}"/>
+    <input type="hidden" name="Webappurl" value="${_sess.apiUrl||API_URL}"/>`;
+}
+function collectUserForm(){
+  const data={};
+  document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value!==''&&!el.readOnly)data[el.getAttribute('name')]=el.value.trim();});
+  return data;
+}
+async function submitAddUser(){
+  const data=collectUserForm();
+  if(!data.Nom){toast('Nom obligatoire','error');return;}
+  if(!data.Id){toast('Identifiant obligatoire','error');return;}
+  if(!data.Mdp){toast('Mot de passe obligatoire','error');return;}
+  if(!data.Statut){toast('Statut obligatoire','error');return;}
+  const r=await MPOST({action:'addUser',data});if(!r)return;
+  toast('Membre ajouté ✅','success');clom();loadTeam();
+}
+async function submitEditUser(id){
+  const data=collectUserForm();
+  if(!data.Nom){toast('Nom obligatoire','error');return;}
+  const r=await MPOST({action:'updateUser',targetId:id,data});if(!r)return;
+  toast('Mis à jour ✅','success');clom();loadTeam();
+}
+async function deleteUser(id){
+  if(!confirm('Supprimer ce membre ?'))return;
+  const r=await MPOST({action:'deleteUser',targetId:id});if(!r)return;
+  toast('Supprimé','info');loadTeam();
+}
+
+/* ── LOGIN LOGS ── */
+async function loadLoginLogs(){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  // Bouton purge
+  const bar=document.querySelector('#panel-loginlogs .log-filters');
+  if(bar&&!document.getElementById('btn-purge-ll')){
+    const btn=document.createElement('button');
+    btn.className='btn bdanger sm';btn.id='btn-purge-ll';
+    btn.textContent='🗑 Tout vider';
+    btn.onclick=purgeAllLoginLogs;
+    bar.appendChild(btn);
+  }
+  const tb=document.querySelector('#table-loginlogs tbody');
+  tb.innerHTML='<tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr>';
+  const logs=await GET({action:'getLoginLogs'});
+  if(!logs)return;
+  S.loginLogs=logs;renderLoginLogs();
+}
+async function purgeAllLoginLogs(){
+  if(!confirm('Vider tout le journal des connexions ?'))return;
+  const r=await POST({action:'purgeLoginLogs'});
+  if(!r)return;
+  toast('Journal vidé','info');
+  loadLoginLogs();
+}
+
+async function deleteLoginLog(ts, userId){
+  if(!confirm('Supprimer cette entrée ?'))return;
+  const r=await POST({action:'deleteLoginLog', ts, userId});
+  if(!r)return;
+  toast('Supprimé','info');
+  loadLoginLogs();
+}
+function renderLoginLogs(){
+  const srch=(document.getElementById('ll-search')?.value||'').toLowerCase();
+  const logs=srch?S.loginLogs.filter(l=>Object.values(l).some(v=>String(v).toLowerCase().includes(srch))):S.loginLogs;
+  document.getElementById('ll-count').textContent=logs.length+' connexion'+(logs.length>1?'s':'');
+  const tb=document.querySelector('#table-loginlogs tbody');
+  if(!logs.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="ei">🔑</div><p>Aucune connexion enregistrée</p></div></td></tr>`;return;}
+  tb.innerHTML=logs.map(l=>{
+    const isAd=l['Statut']==='admin';
+    return`<tr>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--mu)">${l['Timestamp']||''}</td>
+      <td><code style="color:var(--bl);background:rgba(37,99,235,.08);padding:2px 6px;border-radius:4px;font-size:11px">${esc(l['UserId']||'')}</code></td>
+      <td style="font-weight:600">${esc(l['UserNom']||'')}</td>
+      <td><span class="badge ${isAd?'bpu':'bsk'}">${isAd?'Admin':'Employé'}</span></td>
+      <td style="color:var(--mu);font-size:11px">${esc(l['Modules consultés']||'—')}</td>
+      ${isAdmin()?`<td><button class="btn bd2 sm" onclick="deleteLoginLog('${esc(l['Timestamp']||'')}','${esc(l['UserId']||'')}')">🗑</button></td>`:'<td></td>'}
+    </tr>`;
+  }).join('');
+}
+
+/* ── CLÔTURE & EXPORT CSV ── */
+async function doPurge(){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  const confirm_val=document.getElementById('purge-confirm-input').value.trim();
+  if(confirm_val!=='CLOTURER'){toast('Taper exactement CLOTURER pour confirmer','error');return;}
+  const prog=document.getElementById('purge-progress');
+  const fill=document.getElementById('purge-fill');
+  const txt=document.getElementById('purge-progress-text');
+  prog.classList.add('on');
+  const modules=Object.keys(MM);
+  const allData={};
+  // 1. Récupérer toutes les données
+  for(let i=0;i<modules.length;i++){
+    const m=modules[i];
+    txt.textContent=`Export ${MM[m].label}…`;fill.style.width=(i/modules.length*50)+'%';
+    const rows=await GET({action:'getAll',module:m});
+    allData[m]=rows||[];
+  }
+  // 2. Construire le CSV
+  txt.textContent='Génération du fichier CSV…';fill.style.width='55%';
+  const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+  const csvLines=['EasyHygie — Export de clôture — '+ts,''];
+  for(const m of modules){
+    const rows=allData[m];if(!rows.length)continue;
+    csvLines.push('=== '+MM[m].label+' ===');
+    const keys=Object.keys(rows[0]).filter(k=>!k.startsWith('_'));
+    csvLines.push(keys.map(k=>'"'+k+'"').join(','));
+    rows.forEach(r=>csvLines.push(keys.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
+    csvLines.push('');
+  }
+  // 3. Télécharger
+  txt.textContent='Téléchargement…';fill.style.width='65%';
+  const blob=new Blob([csvLines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='EasyHygie_Cloture_'+ts+'.csv';a.click();
+  URL.revokeObjectURL(url);
+  await new Promise(r=>setTimeout(r,800));
+  // 4. Purger chaque module
+  for(let i=0;i<modules.length;i++){
+    const m=modules[i];
+    txt.textContent=`Purge ${MM[m].label}…`;fill.style.width=(65+i/modules.length*30)+'%';
+    await POST({action:'purgeModule',module:m});
+  }
+  // Purger aussi les LoginLogs
+  await POST({action:'purgeLoginLogs'});
+  fill.style.width='100%';txt.textContent='Clôture terminée ✅';
+  sendLog('purge','all','','','Clôture de période — export CSV');
+  // Log de clôture dans le backend HACCP
+  await updateLoginModules('CLÔTURE — '+ts);
+  document.getElementById('purge-confirm-input').value='';
+  toast('Clôture effectuée — CSV téléchargé ✅','success');
+  setTimeout(()=>{prog.classList.remove('on');fill.style.width='0%';},3000);
+  setTimeout(()=>loadDashboard(),2000);
+}
+
+/* ── TIME PICKER ── */
+function tfF(name,label,val){
+  const id='_tf'+name.replace(/\W/g,'_');
+  return`<div class="field"><label>${label}</label><div class="tpw"><input type="time" id="${id}" name="${name}" value="${val}" onchange="onTC()"/><button type="button" class="tpb" onclick="togC('${id}')" title="Régler">🕐</button><div class="cpop" id="cp_${id}"><div class="cdials"><div class="cdial"><div class="cbcol"><button class="cb" onclick="adjC('${id}','h',1)">▲</button></div><div class="cnum" id="ch_${id}">00</div><div class="cbcol"><button class="cb" onclick="adjC('${id}','h',-1)">▼</button></div><label>Heure</label></div><div class="csep">:</div><div class="cdial"><div class="cbcol"><button class="cb" onclick="adjC('${id}','m',1)">▲</button></div><div class="cnum" id="cm_${id}">00</div><div class="cbcol"><button class="cb" onclick="adjC('${id}','m',-1)">▼</button></div><label>Min</label></div></div><button class="btn bp capl" onclick="apC('${id}')">Appliquer</button></div></div></div>`;
+}
+function togC(id){const pop=document.getElementById('cp_'+id),inp=document.getElementById(id);const v=(inp.value||nowT()).split(':');document.getElementById('ch_'+id).textContent=p2(v[0]||0);document.getElementById('cm_'+id).textContent=p2(v[1]||0);pop.classList.toggle('open');}
+function adjC(id,pt,d){const el=document.getElementById((pt==='h'?'ch_':'cm_')+id);let v=parseInt(el.textContent)||0;el.textContent=p2(pt==='h'?(v+d+24)%24:(v+d+60)%60);}
+function apC(id){document.getElementById(id).value=document.getElementById('ch_'+id).textContent+':'+document.getElementById('cm_'+id).textContent;document.getElementById('cp_'+id).classList.remove('open');onTC();}
+document.addEventListener('click',e=>{if(!e.target.closest('.tpw'))document.querySelectorAll('.cpop.open').forEach(p=>p.classList.remove('open'));});
+
+/* ── APPAREIL MANAGER ── */
+function appMgrWidget(type,cur){
+  const apps=S.appareils[type]||[];
+  const opts=apps.map(a=>`<option value="${esc(a)}" ${cur===a?'selected':''}>${esc(a)}</option>`).join('');
+  const tags=apps.map(a=>`<div class="app-tag">${esc(a)}<button class="rm" onclick="rmApp('${type}','${esc(a)}')" title="Supprimer">✕</button></div>`).join('');
+  return`<div class="app-mgr full"><div class="app-mgr-title">⚙️ Appareils — ${type==='froid'?'Contrôle Froid':'Huiles'}</div><div class="app-list" id="app-list-${type}">${tags||'<span style="color:var(--mu);font-size:11px">Aucun appareil</span>'}</div><div class="app-add-row"><input type="text" id="app-new-${type}" placeholder="Nouveau nom…" onkeydown="if(event.key==='Enter')addApp('${type}')"/><button class="btn bp sm" onclick="addApp('${type}')">＋</button></div></div><div class="field full"><label>Appareil *</label><select name="Appareil" id="app-sel-${type}"><option value="">— Choisir —</option>${opts}</select></div>`;
+}
+async function addApp(t){const inp=document.getElementById('app-new-'+t);const nom=inp.value.trim();if(!nom){toast('Nom obligatoire','error');return;}const r=await POST({action:'addAppareil',type:t,nom});if(!r)return;inp.value='';await loadAppareils(t);refreshAppWidget(t);toast('Appareil ajouté','success');}
+async function rmApp(t,nom){if(!confirm('Supprimer "'+nom+'" ?'))return;const r=await POST({action:'deleteAppareil',type:t,nom});if(!r)return;await loadAppareils(t);refreshAppWidget(t);toast('Supprimé','info');}
+function refreshAppWidget(t){
+  const apps=S.appareils[t]||[];
+  const le=document.getElementById('app-list-'+t);if(le){const tags=apps.map(a=>`<div class="app-tag">${esc(a)}<button class="rm" onclick="rmApp('${t}','${esc(a)}')" title="Supprimer">✕</button></div>`).join('');le.innerHTML=tags||'<span style="color:var(--mu);font-size:11px">Aucun appareil</span>';}
+  const sel=document.getElementById('app-sel-'+t);if(sel){const c=sel.value;sel.innerHTML='<option value="">— Choisir —</option>'+apps.map(a=>`<option value="${esc(a)}" ${c===a?'selected':''}>${esc(a)}</option>`).join('');}
+}
+
+/* ── FORMS HACCP ── */
+function fmHuiles(d={}){const chim=d['Contrôle chimique']||'',vis=d['Contrôle visuel']||'',conf=calcH(chim,vis),isNC=conf==='Non conforme';return`<div class="fg">${appMgrWidget('huiles',d['Appareil']||'')}<div class="field"><label>Date</label><input type="date" name="Date" value="${d['Date']||today()}"/></div><div class="field"><label>Visa</label><input type="text" name="Visa" value="${esc(d['Visa']||'')}"/></div><div class="field"><label>Contrôle chimique *</label><select name="Contrôle chimique" id="hc_c" onchange="uH()"><option value="">—</option><option value="Conforme" ${chim==='Conforme'?'selected':''}>Conforme</option><option value="Non conforme" ${chim==='Non conforme'?'selected':''}>Non conforme</option><option value="Non réalisé" ${chim==='Non réalisé'?'selected':''}>Non réalisé</option></select></div><div class="field"><label>Contrôle visuel *</label><select name="Contrôle visuel" id="hc_v" onchange="uH()"><option value="">—</option><option value="Conforme" ${vis==='Conforme'?'selected':''}>Conforme</option><option value="Non conforme" ${vis==='Non conforme'?'selected':''}>Non conforme</option><option value="Non réalisé" ${vis==='Non réalisé'?'selected':''}>Non réalisé</option></select></div><div class="field full"><label>Conformité (auto)</label><div class="fro ${isNC?'nc':'ok'}" id="hc_conf">${conf||'—'}</div><input type="hidden" name="Conformité" id="hc_ch" value="${conf}"/></div><div id="hc_ncw" class="full fg" style="${isNC?'':'display:none'}"><div class="field full"><label>Action corrective *</label><textarea name="Action">${esc(d['Action']||'')}</textarea></div><div class="field full"><label>Réglé/Non-réglé *</label><select name="Réglé/Non-réglé" id="hc_rgl"><option value="">—</option><option value="Non-réglé" ${d['Réglé/Non-réglé']==='Non-réglé'?'selected':''}>Non-réglé</option><option value="Réglé" ${d['Réglé/Non-réglé']==='Réglé'?'selected':''}>Réglé</option></select></div></div></div>`;}
+const calcH=(c,v)=>(c==='Non conforme'||v==='Non conforme')?'Non conforme':(c&&v&&c!==''&&v!==''?'Conforme':'');
+function uH(){const c=document.getElementById('hc_c')?.value||'',v=document.getElementById('hc_v')?.value||'',conf=calcH(c,v),isNC=conf==='Non conforme';const el=document.getElementById('hc_conf');if(el){el.textContent=conf||'—';el.className='fro '+(isNC?'nc':'ok');}const h=document.getElementById('hc_ch');if(h)h.value=conf;const w=document.getElementById('hc_ncw');if(w)w.style.display=isNC?'':'none';}
+function valH(){if(!document.getElementById('app-sel-huiles')?.value){toast('Choisir un appareil','error');return false;}if(!document.getElementById('hc_c')?.value){toast('Contrôle chimique obligatoire','error');return false;}if(!document.getElementById('hc_v')?.value){toast('Contrôle visuel obligatoire','error');return false;}if(document.getElementById('hc_ch')?.value==='Non conforme'){if(!qv('[name="Action"]')){toast('Action obligatoire','error');return false;}if(!document.getElementById('hc_rgl')?.value){toast('Statut obligatoire','error');return false;}}return true;}
+
+function fmReception(d={}){const tp=d['Type produit']||'',te=d['T°C entrée'],conf=d['Conformité']||'',isNC=conf==='Non conforme',hasTmp=tp&&tp!=='Sec',cib=tp==='Frais'?4:tp==='Surgelé'?-18:'';return`<div class="fg"><div class="field"><label>Date</label><input type="date" name="Date" value="${d['Date']||today()}"/></div><div class="field"><label>Fournisseur</label><input type="text" name="Fournisseur" value="${esc(d['Fournisseur']||'')}"/></div><div class="field"><label>N° BL</label><input type="text" name="N° BL" value="${esc(d['N° BL']||'')}"/></div><div class="field"><label>Type produit *</label><select name="Type produit" id="rc_tp" onchange="uRec()"><option value="">—</option><option value="Sec" ${tp==='Sec'?'selected':''}>🌾 Sec</option><option value="Frais" ${tp==='Frais'?'selected':''}>🥩 Frais (≤+4°C)</option><option value="Surgelé" ${tp==='Surgelé'?'selected':''}>🧊 Surgelé (≤-18°C)</option></select></div><div class="field full"><label>Produit</label><input type="text" name="Produit" value="${esc(d['Produit']||'')}"/></div><div id="rc_sec_conf" class="field full" style="${tp==='Sec'?'':'display:none'}"><label>Conformité *</label><select name="_conf_sec" id="rc_sec_sel" onchange="uRecSecConf()"><option value="">—</option><option value="Conforme" ${tp==='Sec'&&conf==='Conforme'?'selected':''}>Conforme</option><option value="Non conforme" ${tp==='Sec'&&conf==='Non conforme'?'selected':''}>Non conforme</option></select></div><div id="rc_tmp" style="${hasTmp?'display:contents':'display:none'}"><div class="field"><label>T°C Entrée *</label><input type="number" step="0.1" name="T°C entrée" id="rc_te" value="${te!==undefined&&te!==''?te:''}" oninput="uRecConf()"/></div><div class="field"><label>T°C Cible (auto)</label><div class="fro inf" id="rc_tc">${cib!==''?cib+'°C':'—'}</div><input type="hidden" name="T°C cible" id="rc_tch" value="${cib}"/></div></div><div class="field full"><label>Conformité (auto)</label><div class="fro ${isNC?'nc':conf==='Conforme'?'ok':''}" id="rc_conf">${conf||'—'}</div><input type="hidden" name="Conformité" id="rc_ch" value="${conf}"/></div><div id="rc_ncw" class="full fg" style="${isNC?'':'display:none'}"><div class="field full"><label>Action corrective *</label><textarea name="Action">${esc(d['Action']||'')}</textarea></div><div class="field full"><label>Réglé/Non-réglé *</label><select name="Réglé/Non-réglé" id="rc_rgl"><option value="">—</option><option value="Non-réglé" ${d['Réglé/Non-réglé']==='Non-réglé'?'selected':''}>Non-réglé</option><option value="Réglé" ${d['Réglé/Non-réglé']==='Réglé'?'selected':''}>Réglé</option></select></div></div></div>`;}
+function uRec(){const tp=document.getElementById('rc_tp')?.value;document.getElementById('rc_sec_conf').style.display=tp==='Sec'?'':'none';document.getElementById('rc_tmp').style.display=(tp&&tp!=='Sec')?'contents':'none';const cib=tp==='Frais'?4:tp==='Surgelé'?-18:'';const tc=document.getElementById('rc_tc');if(tc)tc.textContent=cib!==''?cib+'°C':'—';const tch=document.getElementById('rc_tch');if(tch)tch.value=cib;if(tp==='Sec'){document.getElementById('rc_sec_sel').value='';setRC('');}else uRecConf();}
+function uRecSecConf(){setRC(document.getElementById('rc_sec_sel')?.value||'');}
+function uRecConf(){const tp=document.getElementById('rc_tp')?.value;if(!tp||tp==='Sec')return;const tv=document.getElementById('rc_te')?.value;if(tv===''||tv===undefined){setRC('');return;}setRC(parseFloat(tv)<=(tp==='Frais'?4:-18)?'Conforme':'Non conforme');}
+function setRC(conf){const el=document.getElementById('rc_conf');if(el){el.textContent=conf||'—';el.className='fro '+(conf==='Non conforme'?'nc':conf==='Conforme'?'ok':'');}const h=document.getElementById('rc_ch');if(h)h.value=conf;const w=document.getElementById('rc_ncw');if(w)w.style.display=conf==='Non conforme'?'':'none';}
+function valRec(){if(!document.getElementById('rc_tp')?.value){toast('Type obligatoire','error');return false;}const tp=document.getElementById('rc_tp').value;if(tp==='Sec'){if(!document.getElementById('rc_sec_sel')?.value){toast('Conformité obligatoire','error');return false;}}else{if(!document.getElementById('rc_te')?.value){toast('T°C entrée obligatoire','error');return false;}}if(document.getElementById('rc_ch')?.value==='Non conforme'){if(!qv('[name="Action"]')){toast('Action obligatoire','error');return false;}if(!document.getElementById('rc_rgl')?.value){toast('Statut obligatoire','error');return false;}}return true;}
+
+function fmFroid(d={}){const tp=d['Type_controle']||'',te=d['T°C entrée'],conf=d['Conformité']||'',isNC=conf==='Non conforme',cib=tp==='Frigo'?2.5:tp==='Congélateur'?-18:'',crit=tp==='Frigo'?4:tp==='Congélateur'?-16:'';return`<div class="fg">${appMgrWidget('froid',d['Appareil']||'')}<div class="field"><label>Date</label><input type="date" name="Date" value="${d['Date']||today()}"/></div>${tfF('Heure','Heure du relevé',d['Heure']||nowT())}<div class="field"><label>Type contrôle *</label><select name="Type_controle" id="fr_tp" onchange="uFr()"><option value="">—</option><option value="Frigo" ${tp==='Frigo'?'selected':''}>❄️ Frigo</option><option value="Congélateur" ${tp==='Congélateur'?'selected':''}>🧊 Congélateur</option></select></div><div class="field"><label>T°C Mesurée *</label><input type="number" step="0.1" name="T°C entrée" id="fr_te" value="${te!==undefined&&te!==''?te:''}" oninput="uFrConf()"/></div><div class="field"><label>T°C Cible (auto)</label><div class="fro inf" id="fr_tc">${cib!==''?cib+'°C':'—'}</div><input type="hidden" name="T°C cible" id="fr_tch" value="${cib}"/></div><div class="field"><label>T°C Critique (auto)</label><div class="fro" style="color:var(--wn)" id="fr_tcr">${crit!==''?crit+'°C':'—'}</div><input type="hidden" name="T°C critique" id="fr_tcrh" value="${crit}"/></div><div class="field full"><label>Conformité (auto)</label><div class="fro ${isNC?'nc':conf==='Conforme'?'ok':''}" id="fr_conf">${conf||'—'}</div><input type="hidden" name="Conformité" id="fr_ch" value="${conf}"/></div><div id="fr_ncw" class="full fg" style="${isNC?'':'display:none'}"><div class="nca full" style="margin-bottom:4px">⚠️ Température au-delà du seuil critique</div><div class="field full"><label>Action corrective *</label><textarea name="Action">${esc(d['Action']||'')}</textarea></div><div class="field full"><label>Réglé/Non-réglé *</label><select name="Réglé/Non-réglé" id="fr_rgl"><option value="">—</option><option value="Non-réglé" ${d['Réglé/Non-réglé']==='Non-réglé'?'selected':''}>Non-réglé</option><option value="Réglé" ${d['Réglé/Non-réglé']==='Réglé'?'selected':''}>Réglé</option></select></div></div></div>`;}
+function uFr(){const tp=document.getElementById('fr_tp')?.value;const cib=tp==='Frigo'?2.5:tp==='Congélateur'?-18:'';const crit=tp==='Frigo'?4:tp==='Congélateur'?-16:'';const tc=document.getElementById('fr_tc');if(tc)tc.textContent=cib!==''?cib+'°C':'—';const tch=document.getElementById('fr_tch');if(tch)tch.value=cib;const tcr=document.getElementById('fr_tcr');if(tcr)tcr.textContent=crit!==''?crit+'°C':'—';const tcrh=document.getElementById('fr_tcrh');if(tcrh)tcrh.value=crit;uFrConf();}
+function uFrConf(){const tp=document.getElementById('fr_tp')?.value;const tv=document.getElementById('fr_te')?.value;if(!tp||tv===''||tv===undefined){setFR('');return;}setFR(parseFloat(tv)>(tp==='Frigo'?4:-16)?'Non conforme':'Conforme');}
+function setFR(conf){const el=document.getElementById('fr_conf');if(el){el.textContent=conf||'—';el.className='fro '+(conf==='Non conforme'?'nc':conf==='Conforme'?'ok':'');}const h=document.getElementById('fr_ch');if(h)h.value=conf;const w=document.getElementById('fr_ncw');if(w)w.style.display=conf==='Non conforme'?'':'none';}
+function valFr(){if(!document.getElementById('app-sel-froid')?.value){toast('Choisir un appareil','error');return false;}if(!document.getElementById('fr_tp')?.value){toast('Type obligatoire','error');return false;}if(!document.getElementById('fr_te')?.value){toast('T°C mesurée obligatoire','error');return false;}if(document.getElementById('fr_ch')?.value==='Non conforme'){if(!qv('[name="Action"]')){toast('Action obligatoire','error');return false;}if(!document.getElementById('fr_rgl')?.value){toast('Statut obligatoire','error');return false;}}return true;}
+
+const RULES={refroidissement:{hint:'+63°C → +10°C en ≤ 2h',maxMin:120,tfinMax:10},congelation:{hint:'+10°C → -18°C, idéalement ≤4h',maxMin:240,tfinMax:-18},remise:{hint:'+3°C → ≥+63°C en ≤ 1h',maxMin:60,tfinMin:63}};
+let _tm='';
+function fmTherm(mod,d={}){const conf=d['Conformité']||'',isNC=conf==='Non conforme',rule=RULES[mod];return`<div class="rh">🔹 ${rule.hint}</div><div class="fg"><div class="field"><label>Date</label><input type="date" name="Date" value="${d['Date']||today()}"/></div><div class="field"><label>Produit</label><input type="text" name="Produit" value="${esc(d['Produit']||'')}"/></div>${tfF('H début','Heure début',d['H début']||nowT())}<div class="field"><label>T°C début</label><input type="number" step="0.1" name="T°C début" id="th_td" value="${d['T°C début']!==undefined?d['T°C début']:''}" oninput="uTh('${mod}')"/></div>${tfF('H fin','Heure fin',d['H fin']||nowT())}<div class="field"><label>T°C fin</label><input type="number" step="0.1" name="T°C fin" id="th_tf" value="${d['T°C fin']!==undefined?d['T°C fin']:''}" oninput="uTh('${mod}')"/></div><div class="field"><label>Durée (calculée)</label><div class="fro inf" id="th_delta">${d['Delta']||'—'}</div><input type="hidden" name="Delta" id="th_dh" value="${d['Delta']||''}"/></div><div class="field full"><label>Conformité (auto)</label><div class="fro ${isNC?'nc':conf==='Conforme'?'ok':''}" id="th_conf">${conf||'—'}</div><input type="hidden" name="Conformité" id="th_ch" value="${conf}"/></div><div id="th_ncw" class="full fg" style="${isNC?'':'display:none'}"><div class="nca full" style="margin-bottom:4px">⚠️ Non-conformité détectée</div><div class="field full"><label>Action corrective *</label><textarea name="Action">${esc(d['Action']||'')}</textarea></div><div class="field full"><label>Réglé/Non-réglé *</label><select name="Réglé/Non-réglé" id="th_rgl"><option value="">—</option><option value="Non-réglé" ${d['Réglé/Non-réglé']==='Non-réglé'?'selected':''}>Non-réglé</option><option value="Réglé" ${d['Réglé/Non-réglé']==='Réglé'?'selected':''}>Réglé</option></select></div></div></div>`;}
+function onTC(){if(_tm)uTh(_tm);}
+function uTh(mod){_tm=mod;const h1=document.querySelector('[name="H début"]')?.value||'',h2=document.querySelector('[name="H fin"]')?.value||'',tf=document.getElementById('th_tf')?.value;let delta=null,dStr='—';if(h1&&h2){delta=minBt(h1,h2);const abs=Math.abs(delta),h=Math.floor(abs/60),m=abs%60;dStr=(delta<0?'-':'')+h+'h'+p2(m);const el=document.getElementById('th_delta');if(el)el.textContent=dStr;const hid=document.getElementById('th_dh');if(hid)hid.value=dStr;}const rule=RULES[mod];if(!rule)return;if(delta===null||tf===''||tf===undefined){setTH('');return;}const tfv=parseFloat(tf);let nc=false;if(Math.abs(delta)>rule.maxMin)nc=true;if(rule.tfinMax!==undefined&&tfv>rule.tfinMax)nc=true;if(rule.tfinMin!==undefined&&tfv<rule.tfinMin)nc=true;setTH(nc?'Non conforme':'Conforme');}
+function setTH(conf){const el=document.getElementById('th_conf');if(el){el.textContent=conf||'—';el.className='fro '+(conf==='Non conforme'?'nc':conf==='Conforme'?'ok':'');}const h=document.getElementById('th_ch');if(h)h.value=conf;const w=document.getElementById('th_ncw');if(w)w.style.display=conf==='Non conforme'?'':'none';}
+function valTh(mod){if(document.getElementById('th_ch')?.value==='Non conforme'){if(!qv('[name="Action"]')){toast('Action obligatoire','error');return false;}if(!document.getElementById('th_rgl')?.value){toast('Statut obligatoire','error');return false;}}return true;}
+
+/* ── MODALS HACCP ── */
+function openAdd(mod){_tm='';document.getElementById('mt').textContent='＋ '+MM[mod].icon+' '+MM[mod].label;let body='';if(mod==='huiles')body=fmHuiles();else if(mod==='reception')body=fmReception();else if(mod==='froid')body=fmFroid();else{body=fmTherm(mod);_tm=mod;}document.getElementById('mb').innerHTML=body;document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subAdd('${mod}')">💾 Enregistrer</button>`;document.getElementById('mov').classList.add('open');}
+function openEdit(mod,id){_tm='';const row=(S.data[mod]||[]).find(r=>String(r['ID_NC'])===String(id));if(!row){toast('Introuvable','error');return;}document.getElementById('mt').textContent='✏️ Modifier — '+id;let body='';if(mod==='huiles')body=fmHuiles(row);else if(mod==='reception')body=fmReception(row);else if(mod==='froid')body=fmFroid(row);else{body=fmTherm(mod,row);_tm=mod;}document.getElementById('mb').innerHTML=body;document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subEdit('${mod}','${esc(id)}')">💾 Enregistrer</button>`;document.getElementById('mov').classList.add('open');}
+function openDet(mod,id){const row=(S.data[mod]||[]).find(r=>String(r['ID_NC'])===String(id));if(!row)return;document.getElementById('mt').textContent='👁 Détail — '+id;const skip=['_row','_m','_module'];const html=Object.entries(row).filter(([k])=>!skip.includes(k)&&!k.startsWith('_')).map(([k,v])=>{let vd=String(v||'—');if(k==='Conformité'){const l=vd.toLowerCase();vd=l==='conforme'?'<span class="badge bok">Conforme</span>':l==='non conforme'?'<span class="badge bnc">Non conforme</span>':vd;}if(k==='Réglé/Non-réglé'){const l=vd.toLowerCase();vd=l==='réglé'?'<span class="badge bok">Réglé</span>':l.includes('non')?'<span class="badge bnc">Non-réglé</span>':vd;}return`<div style="margin-bottom:12px"><div style="font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:3px;font-weight:600">${k}</div><div>${vd}</div></div>`;}).join('');document.getElementById('mb').innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px">${html}</div>`;const isNC=String(row['Conformité']||'').toLowerCase()==='non conforme',notR=!row['Réglé/Non-réglé']||String(row['Réglé/Non-réglé']).toLowerCase().includes('non');document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Fermer</button>${isNC&&notR?`<button class="btn bp" onclick="openRes('${mod}','${esc(id)}')">✅ Résoudre NC</button>`:''}`;document.getElementById('mov').classList.add('open');}
+function openRes(mod,id){document.getElementById('mt').textContent='✅ Résoudre NC — '+id;document.getElementById('mb').innerHTML=`<div class="nca" style="margin-bottom:16px">Clôturer cette non-conformité.</div><div class="field"><label>Action corrective *</label><textarea id="res-act" placeholder="Décrire l'action corrective appliquée…"></textarea></div>`;document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subRes('${mod}','${esc(id)}')">✅ Confirmer</button>`;document.getElementById('mov').classList.add('open');}
+function clom(){document.getElementById('mov').classList.remove('open');_tm='';}
+function clov(e){if(e.target===document.getElementById('mov'))clom();}
+
+/* ── COLLECT & VALIDATE ── */
+const qv=sel=>{const el=document.querySelector('#mb '+sel);return el?.value?.trim();};
+function collect(){const data={};document.querySelectorAll('#mb [name]').forEach(el=>{const n=el.getAttribute('name');if(n==='_conf_sec')return;if(el.tagName==='INPUT'&&el.type==='hidden'){data[n]=el.value;}else if(el.value!=='')data[n]=el.value;});['froid','huiles'].forEach(t=>{const sel=document.getElementById('app-sel-'+t);if(sel&&sel.value)data['Appareil']=sel.value;});return data;}
+function validate(mod){if(mod==='huiles')return valH();if(mod==='reception')return valRec();if(mod==='froid')return valFr();if(['refroidissement','congelation','remise'].includes(mod))return valTh(mod);return true;}
+
+/* ── CRUD HACCP ── */
+async function subAdd(mod){if(!validate(mod))return;const d=collect();const r=await POST({action:'add',module:mod,data:d});if(!r)return;toast('Ajouté : '+r.id,'success');clom();loadModule(mod);sendLog('add',mod,r.id,d['Conformité'],'');}
+async function subEdit(mod,id){if(!validate(mod))return;const d=collect();const r=await POST({action:'update',module:mod,id,data:d});if(!r)return;toast('Mis à jour','success');clom();loadModule(mod);sendLog('update',mod,id,d['Conformité'],'');}
+async function delRow(mod,id){if(!confirm('Supprimer '+id+' ?'))return;const r=await POST({action:'delete',module:mod,id});if(!r)return;toast('Supprimé','info');loadModule(mod);sendLog('delete',mod,id,'','');}
+async function subRes(mod,id){const act=document.getElementById('res-act')?.value?.trim();if(!act){toast('Action obligatoire','error');return;}const r=await POST({action:'resolveNC',module:mod,id,data:{action:act}});if(!r)return;toast('NC résolue ✅','success');clom();loadModule(mod);loadDashboard();sendLog('resolveNC',mod,id,'Réglé',act);}
+
+/* ── TOAST ── */
+function toast(msg,t='info'){const icons={success:'✅',error:'❌',info:'ℹ️'};const el=document.createElement('div');el.className='toast '+t;el.innerHTML=`<span>${icons[t]}</span><span>${msg}</span>`;document.getElementById('tc').appendChild(el);setTimeout(()=>el.remove(),3800);}
+
+/* ── INIT ── */
+window.addEventListener('DOMContentLoaded',()=>{
+  if(loadSession()){showApp();}else{showLogin();}
+});
+// ── État BL ──────────────────────────────────────────────────
+let _blData = []; // tous les BL groupés
+ 
+// ── Surcharge loadModule pour reception ──────────────────────
+async function loadModule(m) {
+  if (m === 'reception') { await loadBL(); return; }
+  const tb=document.querySelector(`#table-${m} tbody`);
+  tb.innerHTML=`<tr><td colspan="20"><div class="ld"><div class="sp"></div></div></td></tr>`;
+  const rows=await GET({action:'getAll',module:m});
+  if(!rows)return;S.data[m]=rows;renderTable(m,rows);
+}
+ 
+// ── Charger les BL ───────────────────────────────────────────
+async function loadBL() {
+  const tb = document.querySelector('#table-reception tbody');
+  tb.innerHTML = '<tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr>';
+  const bls = await GET({action: 'getBLGrouped'});
+  if (!bls) return;
+  _blData = bls;
+  renderBLList(bls);
+}
+ 
+function renderBLList(bls) {
+  const tb = document.querySelector('#table-reception tbody');
+  if (!bls || !bls.length) {
+    tb.innerHTML = '<tr><td colspan="8"><div class="empty"><div class="ei">📋</div><p>Aucun BL enregistré</p></div></td></tr>';
+    return;
+  }
+  tb.innerHTML = bls.map(bl => {
+    const nc = bl.conformite === 'Non conforme';
+    const nr = bl.nonRegle;
+    return `<tr>
+      <td><code style="color:var(--bl);font-size:11px;background:rgba(37,99,235,.08);padding:2px 6px;border-radius:4px">${esc(bl.ID_BL)}</code></td>
+      <td>${bl.Date||''}</td>
+      <td style="font-weight:600">${esc(bl.Fournisseur||'')}</td>
+      <td>${esc(bl['N° BL']||'')}</td>
+      <td><span style="background:rgba(37,99,235,.1);color:var(--bl);padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">${bl.lignes.length} produit${bl.lignes.length>1?'s':''}</span></td>
+      <td>${nc ? '<span class="badge bnc">Non conf.</span>' : '<span class="badge bok">Conforme</span>'}</td>
+      <td>${nr ? '<span class="badge bnc">Non-réglé</span>' : '<span class="badge bok">Réglé</span>'}</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn bp sm" onclick="openBLDetail('${esc(bl.ID_BL)}')">📋 Détail</button>
+          <button class="btn bd2 sm" onclick="deleteBL('${esc(bl.ID_BL)}')">🗑</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+ 
+function filterBL(q) {
+  const fq = q.toLowerCase();
+  renderBLList(fq ? _blData.filter(bl =>
+    Object.values(bl).some(v => String(v).toLowerCase().includes(fq)) ||
+    bl.lignes.some(l => Object.values(l).some(v => String(v).toLowerCase().includes(fq)))
+  ) : _blData);
+}
+ 
+// ── Ouvrir détail BL ─────────────────────────────────────────
+function openBLDetail(blId) {
+  const bl = _blData.find(b => b.ID_BL === blId);
+  if (!bl) return;
+  document.getElementById('mt').textContent = '📋 BL — ' + esc(bl['N° BL']||blId) + ' · ' + esc(bl.Fournisseur||'');
+  document.getElementById('mb').innerHTML = renderBLDetailHTML(bl);
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="clom()">Fermer</button>
+    <button class="btn bp" onclick="openAddLigne('${esc(blId)}')">＋ Ajouter une matière</button>
+  `;
+  document.getElementById('mov').classList.add('open');
+}
+ 
+function renderBLDetailHTML(bl) {
+  const lignes = bl.lignes || [];
+  if (!lignes.length) return '<div class="empty"><div class="ei">📦</div><p>Aucune matière</p></div>';
+  return `
+    <div style="margin-bottom:12px;padding:10px 14px;background:var(--sf2);border-radius:var(--rs);border:1.5px solid var(--bd);font-size:12px">
+      <span style="font-weight:700">📅 ${bl.Date||'—'}</span> &nbsp;·&nbsp;
+      <span style="font-weight:700">🏭 ${esc(bl.Fournisseur||'—')}</span> &nbsp;·&nbsp;
+      <span style="font-weight:700">📄 N°${esc(bl['N° BL']||'—')}</span>
+    </div>
+    <div class="twrap" style="border-radius:var(--rs)">
+      <table style="width:100%">
+        <thead>
+          <tr>
+            <th>Ligne</th>
+            <th>Type</th>
+            <th>Produit</th>
+            <th>T°C Entrée</th>
+            <th>T°C Cible</th>
+            <th>Conformité</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${lignes.map(l => {
+            const nc = String(l['Conformité']||'').toLowerCase() === 'non conforme';
+            const nr = String(l['Réglé/Non-réglé']||'').toLowerCase().includes('non');
+            const lid = esc(l['ID_Ligne']||'');
+            const bid = esc(l['ID_BL']||'');
+            return `<tr>
+              <td><code style="font-size:10px;color:var(--mu)">${lid}</code></td>
+              <td>${esc(l['Type produit']||'')}</td>
+              <td style="font-weight:600">${esc(l['Produit']||'')}</td>
+              <td>${l['T°C entrée']!==''&&l['T°C entrée']!==undefined?l['T°C entrée']+'°C':'—'}</td>
+              <td>${l['T°C cible']!==''&&l['T°C cible']!==undefined?l['T°C cible']+'°C':'—'}</td>
+              <td>${nc?'<span class="badge bnc">Non conf.</span>':'<span class="badge bok">Conforme</span>'}</td>
+              <td>${nr?'<span class="badge bnc">Non-réglé</span>':nc?'<span class="badge bgr">—</span>':'<span class="badge bok">OK</span>'}</td>
+              <td>
+                <div style="display:flex;gap:4px">
+                  <button class="btn bg sm" onclick="openEditLigne('${bid}','${lid}')">✏️</button>
+                  ${nc&&nr?`<button class="btn bw sm" onclick="openResLigne('${lid}')">✅</button>`:''}
+                  <button class="btn bd2 sm" onclick="deleteLigne('${lid}','${bid}')">🗑</button>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+ 
+// ── Formulaire BL (nouveau BL) ────────────────────────────────
+function openAddBL() {
+  document.getElementById('mt').textContent = '＋ Nouveau BL de livraison';
+  document.getElementById('mb').innerHTML = fmBL({});
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="clom()">Annuler</button>
+    <button class="btn bp" onclick="subAddBL()">💾 Créer le BL</button>
+  `;
+  document.getElementById('mov').classList.add('open');
+}
+ 
+function fmBL(d={}) {
+  const tp = d['Type produit']||'';
+  const te = d['T°C entrée'];
+  const conf = d['Conformité']||'';
+  const isNC = conf === 'Non conforme';
+  const hasTmp = tp && tp !== 'Sec';
+  const cib = tp==='Frais'?4:tp==='Surgelé'?-18:'';
+  return `<div class="fg">
+    <div class="field"><label>Date *</label><input type="date" name="Date" value="${d['Date']||today()}"/></div>
+    <div class="field"><label>Fournisseur</label><input type="text" name="Fournisseur" value="${esc(d['Fournisseur']||'')}"/></div>
+    <div class="field"><label>N° BL</label><input type="text" name="N° BL" value="${esc(d['N° BL']||'')}"/></div>
+    <div class="field"><label>Type produit *</label>
+      <select name="Type produit" id="rc_tp" onchange="uRec()">
+        <option value="">—</option>
+        <option value="Sec" ${tp==='Sec'?'selected':''}>🌾 Sec</option>
+        <option value="Frais" ${tp==='Frais'?'selected':''}>🥩 Frais (≤+4°C)</option>
+        <option value="Surgelé" ${tp==='Surgelé'?'selected':''}>🧊 Surgelé (≤-18°C)</option>
+      </select>
+    </div>
+    <div class="field full"><label>Produit (1ère matière) *</label><input type="text" name="Produit" value="${esc(d['Produit']||'')}"/></div>
+    <div id="rc_sec_conf" class="field full" style="${tp==='Sec'?'':'display:none'}">
+      <label>Conformité *</label>
+      <select name="_conf_sec" id="rc_sec_sel" onchange="uRecSecConf()">
+        <option value="">—</option>
+        <option value="Conforme" ${tp==='Sec'&&conf==='Conforme'?'selected':''}>Conforme</option>
+        <option value="Non conforme" ${tp==='Sec'&&conf==='Non conforme'?'selected':''}>Non conforme</option>
+      </select>
+    </div>
+    <div id="rc_tmp" style="${hasTmp?'display:contents':'display:none'}">
+      <div class="field"><label>T°C Entrée *</label><input type="number" step="0.1" name="T°C entrée" id="rc_te" value="${te!==undefined&&te!==''?te:''}" oninput="uRecConf()"/></div>
+      <div class="field"><label>T°C Cible (auto)</label><div class="fro inf" id="rc_tc">${cib!==''?cib+'°C':'—'}</div><input type="hidden" name="T°C cible" id="rc_tch" value="${cib}"/></div>
+    </div>
+    <div class="field full"><label>Conformité (auto)</label>
+      <div class="fro ${isNC?'nc':conf==='Conforme'?'ok':''}" id="rc_conf">${conf||'—'}</div>
+      <input type="hidden" name="Conformité" id="rc_ch" value="${conf}"/>
+    </div>
+    <div id="rc_ncw" class="full fg" style="${isNC?'':'display:none'}">
+      <div class="field full"><label>Action corrective *</label><textarea name="Action">${esc(d['Action']||'')}</textarea></div>
+      <div class="field full"><label>Réglé/Non-réglé *</label>
+        <select name="Réglé/Non-réglé" id="rc_rgl">
+          <option value="">—</option>
+          <option value="Non-réglé" ${d['Réglé/Non-réglé']==='Non-réglé'?'selected':''}>Non-réglé</option>
+          <option value="Réglé" ${d['Réglé/Non-réglé']==='Réglé'?'selected':''}>Réglé</option>
+        </select>
+      </div>
+    </div>
+  </div>`;
+}
+ 
+// Formulaire ajout/modif ligne dans un BL existant
+function fmLigne(d={}) {
+  const tp = d['Type produit']||'';
+  const te = d['T°C entrée'];
+  const conf = d['Conformité']||'';
+  const isNC = conf === 'Non conforme';
+  const hasTmp = tp && tp !== 'Sec';
+  const cib = tp==='Frais'?4:tp==='Surgelé'?-18:'';
+  return `<div class="fg">
+    <div class="field"><label>Type produit *</label>
+      <select name="Type produit" id="rc_tp" onchange="uRec()">
+        <option value="">—</option>
+        <option value="Sec" ${tp==='Sec'?'selected':''}>🌾 Sec</option>
+        <option value="Frais" ${tp==='Frais'?'selected':''}>🥩 Frais (≤+4°C)</option>
+        <option value="Surgelé" ${tp==='Surgelé'?'selected':''}>🧊 Surgelé (≤-18°C)</option>
+      </select>
+    </div>
+    <div class="field"><label>Produit *</label><input type="text" name="Produit" value="${esc(d['Produit']||'')}"/></div>
+    <div id="rc_sec_conf" class="field full" style="${tp==='Sec'?'':'display:none'}">
+      <label>Conformité *</label>
+      <select name="_conf_sec" id="rc_sec_sel" onchange="uRecSecConf()">
+        <option value="">—</option>
+        <option value="Conforme" ${tp==='Sec'&&conf==='Conforme'?'selected':''}>Conforme</option>
+        <option value="Non conforme" ${tp==='Sec'&&conf==='Non conforme'?'selected':''}>Non conforme</option>
+      </select>
+    </div>
+    <div id="rc_tmp" style="${hasTmp?'display:contents':'display:none'}">
+      <div class="field"><label>T°C Entrée *</label><input type="number" step="0.1" name="T°C entrée" id="rc_te" value="${te!==undefined&&te!==''?te:''}" oninput="uRecConf()"/></div>
+      <div class="field"><label>T°C Cible (auto)</label><div class="fro inf" id="rc_tc">${cib!==''?cib+'°C':'—'}</div><input type="hidden" name="T°C cible" id="rc_tch" value="${cib}"/></div>
+    </div>
+    <div class="field full"><label>Conformité (auto)</label>
+      <div class="fro ${isNC?'nc':conf==='Conforme'?'ok':''}" id="rc_conf">${conf||'—'}</div>
+      <input type="hidden" name="Conformité" id="rc_ch" value="${conf}"/>
+    </div>
+    <div id="rc_ncw" class="full fg" style="${isNC?'':'display:none'}">
+      <div class="field full"><label>Action corrective *</label><textarea name="Action">${esc(d['Action']||'')}</textarea></div>
+      <div class="field full"><label>Réglé/Non-réglé *</label>
+        <select name="Réglé/Non-réglé" id="rc_rgl">
+          <option value="">—</option>
+          <option value="Non-réglé" ${d['Réglé/Non-réglé']==='Non-réglé'?'selected':''}>Non-réglé</option>
+          <option value="Réglé" ${d['Réglé/Non-réglé']==='Réglé'?'selected':''}>Réglé</option>
+        </select>
+      </div>
+    </div>
+  </div>`;
+}
+ 
+// ── CRUD BL ───────────────────────────────────────────────────
+async function subAddBL() {
+  if (!valRec()) return;
+  const d = collect();
+  const r = await POST({action:'addBL', data:d});
+  if (!r) return;
+  toast('BL créé : '+r.blId, 'success');
+  clom();
+  loadModule('reception');
+  sendLog('add', 'reception', r.blId, d['Conformité'], '');
+}
+ 
+function openAddLigne(blId) {
+  document.getElementById('mt').textContent = '＋ Ajouter une matière — ' + blId;
+  document.getElementById('mb').innerHTML = fmLigne({});
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="openBLDetail('${esc(blId)}')">← Retour</button>
+    <button class="btn bp" onclick="subAddLigne('${esc(blId)}')">💾 Ajouter</button>
+  `;
+}
+ 
+async function subAddLigne(blId) {
+  if (!valRec()) return;
+  const d = collect();
+  const r = await POST({action:'addLigne', blId, data:d});
+  if (!r) return;
+  toast('Matière ajoutée', 'success');
+  await loadModule('reception');
+  openBLDetail(blId);
+  sendLog('add', 'reception', r.ligneId, d['Conformité'], '');
+}
+ 
+function openEditLigne(blId, ligneId) {
+  const bl = _blData.find(b => b.ID_BL === blId);
+  if (!bl) return;
+  const ligne = bl.lignes.find(l => l['ID_Ligne'] === ligneId);
+  if (!ligne) return;
+  document.getElementById('mt').textContent = '✏️ Modifier — ' + ligneId;
+  document.getElementById('mb').innerHTML = fmLigne(ligne);
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="openBLDetail('${esc(blId)}')">← Retour</button>
+    <button class="btn bp" onclick="subEditLigne('${esc(blId)}','${esc(ligneId)}')">💾 Enregistrer</button>
+  `;
+}
+ 
+async function subEditLigne(blId, ligneId) {
+  if (!valRec()) return;
+  const d = collect();
+  const r = await POST({action:'updateLigne', ligneId, data:d});
+  if (!r) return;
+  toast('Mis à jour', 'success');
+  await loadModule('reception');
+  openBLDetail(blId);
+  sendLog('update', 'reception', ligneId, d['Conformité'], '');
+}
+ 
+async function deleteLigne(ligneId, blId) {
+  if (!confirm('Supprimer cette matière ?')) return;
+  const r = await POST({action:'deleteLigne', ligneId});
+  if (!r) return;
+  toast('Supprimé', 'info');
+  await loadModule('reception');
+  // Vérifier si le BL existe encore
+  const bl = _blData.find(b => b.ID_BL === blId);
+  if (bl && bl.lignes.length > 1) openBLDetail(blId);
+  else clom();
+  sendLog('delete', 'reception', ligneId, '', '');
+}
+ 
+async function deleteBL(blId) {
+  if (!confirm('Supprimer le BL '+blId+' et toutes ses matières ?')) return;
+  const r = await POST({action:'deleteBL', blId});
+  if (!r) return;
+  toast('BL supprimé', 'info');
+  loadModule('reception');
+  sendLog('delete', 'reception', blId, '', '');
+}
+ 
+function openResLigne(ligneId) {
+  document.getElementById('mt').textContent = '✅ Résoudre NC — ' + ligneId;
+  document.getElementById('mb').innerHTML = `
+    <div class="nca" style="margin-bottom:16px">Clôturer cette non-conformité.</div>
+    <div class="field"><label>Action corrective *</label>
+      <textarea id="res-act" placeholder="Décrire l'action corrective appliquée…"></textarea>
+    </div>`;
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="clom()">Annuler</button>
+    <button class="btn bp" onclick="subResLigne('${esc(ligneId)}')">✅ Confirmer</button>
+  `;
+}
+ 
+async function subResLigne(ligneId) {
+  const act = document.getElementById('res-act')?.value?.trim();
+  if (!act) { toast('Action obligatoire', 'error'); return; }
+  const r = await POST({action:'resolveLigneNC', ligneId, data:{action:act}});
+  if (!r) return;
+  toast('NC résolue ✅', 'success');
+  clom();
+  loadModule('reception');
+  loadDashboard();
+  sendLog('resolveNC', 'reception', ligneId, 'Réglé', act);
+}
+</script>
+</body>
+</html>
