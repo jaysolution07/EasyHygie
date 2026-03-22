@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="theme-color" content="#0f2447"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="EasyHygie"/>
+<link rel="manifest" href="manifest.json"/>
+<link rel="apple-touch-icon" href="logoEH.png"/>
 <title>EasyHygie · HACCP</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -285,6 +291,97 @@ tbody tr:hover{background:var(--sf2)}
 .toast.success{border-left:3px solid var(--gn)}.toast.error{border-left:3px solid var(--dg)}.toast.info{border-left:3px solid var(--bl)}
 @keyframes tsi{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+/* ── RESPONSIVE MOBILE & TABLETTE ── */
+@media(max-width:768px){
+  /* Sidebar cachée par défaut sur mobile */
+  aside{
+    position:fixed;left:-240px;top:0;height:100vh;z-index:100;
+    transition:left .25s ease;
+  }
+  aside.open{left:0;box-shadow:4px 0 40px rgba(0,0,0,.4)}
+  
+  /* Overlay quand sidebar ouverte */
+  .sidebar-overlay{
+    display:none;position:fixed;inset:0;z-index:99;
+    background:rgba(0,0,0,.4);backdrop-filter:blur(2px);
+  }
+  .sidebar-overlay.on{display:block}
+  
+  /* Bouton hamburger */
+  .hamburger{
+    display:flex!important;align-items:center;justify-content:center;
+    width:36px;height:36px;border-radius:var(--rs);
+    background:var(--sf);border:1.5px solid var(--bd);
+    cursor:pointer;font-size:18px;flex-shrink:0;
+  }
+  
+  /* Main prend toute la largeur */
+  .app{flex-direction:column}
+  main{width:100%}
+  
+  /* Topbar */
+  .topbar{padding:10px 16px;gap:10px}
+  .ptitle{font-size:15px}
+  
+  /* Content */
+  .content{padding:14px}
+  
+  /* KPI grid */
+  .kgrid{grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+  .kv{font-size:24px}
+  
+  /* Cards DR grid */
+  .dr{grid-template-columns:1fr!important;gap:12px}
+  
+  /* Tables scrollables */
+  .twrap{border-radius:var(--rs)}
+  td,th{padding:8px 10px!important;font-size:11.5px}
+  
+  /* Modal plein écran */
+  .modal{width:100vw!important;max-width:100vw;max-height:100vh;
+    border-radius:0;margin:0;height:100vh;
+    display:flex;flex-direction:column}
+  .mb{flex:1;overflow-y:auto}
+  .mh{border-radius:0}
+  .mf{flex-shrink:0}
+  
+  /* Forms */
+  .fg{grid-template-columns:1fr!important}
+  .fg .full{grid-column:1}
+  
+  /* Buttons */
+  .btn{padding:8px 12px;font-size:12px}
+  .sm{padding:5px 9px;font-size:11px}
+  
+  /* TB bar */
+  .tb-bar{gap:8px}
+  .tb-bar input[type=text]{min-width:0}
+  
+  /* Log filters */
+  .log-filters{flex-direction:column;gap:8px}
+  .log-filters select,.log-filters input{width:100%}
+  
+  /* Log stats */
+  .log-stat-bar{gap:8px}
+  .log-stat{padding:10px 14px}
+  .log-stat-v{font-size:22px}
+  
+  /* Team grid */
+  .team-grid{grid-template-columns:1fr}
+  
+  /* Purge box */
+  .purge-box{padding:18px 16px}
+  
+  /* Thermo widget caché sur petit écran */
+  .thermo-widget{display:none}
+}
+
+@media(max-width:480px){
+  .kgrid{grid-template-columns:1fr 1fr;gap:8px}
+  .kc{padding:12px}
+  .kv{font-size:20px}
+  .content{padding:10px}
+}
 </style>
 </head>
 <body>
@@ -333,6 +430,7 @@ tbody tr:hover{background:var(--sf2)}
 <!-- ═══ APP ═══ -->
 <div id="app-screen">
   <div class="bg-bubbles" id="bubbles"></div>
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
   <div class="app">
     <aside>
       <div class="logo">
@@ -358,6 +456,7 @@ tbody tr:hover{background:var(--sf2)}
         <div class="ni" data-p="refroidissement" onclick="showPanel('refroidissement',this)"><span class="ic">🌡</span>Refroidissement<span class="nbadge" id="b-refroidissement"></span></div>
         <div class="ni" data-p="congelation" onclick="showPanel('congelation',this)"><span class="ic">🧊</span>Congélation<span class="nbadge" id="b-congelation"></span></div>
         <div class="ni" data-p="remise" onclick="showPanel('remise',this)"><span class="ic">♨️</span>Remise en T°<span class="nbadge" id="b-remise"></span></div>
+<div class="ni" data-p="nettoyage" onclick="showPanel('nettoyage',this)"><span class="ic">🧹</span>Nettoyage<span class="nbadge" id="b-nettoyage"></span></div>
         <div class="nsec">Outils</div>
         <div class="ni" data-p="logs" onclick="showPanel('logs',this)"><span class="ic">📋</span>Journaux</div>
         <div class="ni ni-admin-only" id="ni-team" data-p="team" onclick="showPanel('team',this)"><span class="ic">👥</span>Équipe</div>
@@ -382,28 +481,41 @@ tbody tr:hover{background:var(--sf2)}
 
     <main>
       <div class="topbar">
-        <div class="ptitle" id="ptitle">📊  Tableau de bord</div>
-        <button class="btn bg sm" onclick="refreshCurrent()">↻ Actualiser</button>
-      </div>
+  <div class="hamburger" style="display:none" onclick="toggleSidebar()">☰</div>
+  <div class="ptitle" id="ptitle">📊  Tableau de bord</div>
+  <button class="btn bg sm" onclick="refreshCurrent()">↻ Actualiser</button>
+</div>
       <div class="content">
 
-        <!-- DASHBOARD -->
-        <div class="panel active" id="panel-dashboard">
-          <div class="kgrid" id="kgrid"><div class="ld"><div class="sp"></div>Chargement…</div></div>
-          <div class="dr">
-            <div class="card"><div class="card-h"><div class="card-t">🚨 NC ouvertes</div></div><div class="card-b" id="nc-list"><div class="ld"><div class="sp"></div></div></div></div>
-            <div class="card"><div class="card-h"><div class="card-t">📈 Conformité par module</div></div><div class="card-b" id="mod-bars"><div class="ld"><div class="sp"></div></div></div></div>
-          </div>
-          <div class="dr" style="margin-top:18px">
-            <div class="card" style="grid-column:1/-1">
-              <div class="card-h">
-                <div class="card-t">🌡 Courbes Contrôle Froid</div>
-                <select id="chart-sel" style="background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:6px 10px;border-radius:var(--rs);cursor:pointer;outline:none" onchange="renderFroidChart()"><option value="">Tous les appareils</option></select>
-              </div>
-              <div class="card-b" style="height:260px;position:relative"><canvas id="froid-chart"></canvas></div>
-            </div>
-          </div>
-        </div>
+<!-- DASHBOARD -->
+<div class="panel active" id="panel-dashboard">
+  <div class="kgrid" id="kgrid"><div class="ld"><div class="sp"></div>Chargement…</div></div>
+  <div class="dr">
+    <div class="card"><div class="card-h"><div class="card-t">🚨 NC ouvertes</div></div><div class="card-b" id="nc-list"><div class="ld"><div class="sp"></div></div></div></div>
+    <div class="card"><div class="card-h"><div class="card-t">📈 Conformité par module</div></div><div class="card-b" id="mod-bars"><div class="ld"><div class="sp"></div></div></div></div>
+  </div>
+<div class="dr" style="margin-top:18px">
+  <div class="card" style="grid-column:1/-1">
+    <div class="card-h"><div class="card-t">🌡 Appareils — contrôles en retard</div><button class="btn bg sm" onclick="showPanel('froid',document.querySelector('[data-p=froid]'))">Voir →</button></div>
+    <div class="card-b" id="appareils-dashboard"><div class="ld"><div class="sp"></div></div></div>
+  </div>
+</div>
+  <div class="dr" style="margin-top:18px">
+    <div class="card" style="grid-column:1/-1">
+      <div class="card-h"><div class="card-t">🧹 Nettoyage — tâches en retard</div><button class="btn bg sm" onclick="showPanel('nettoyage',document.querySelector('[data-p=nettoyage]'))">Voir tout →</button></div>
+      <div class="card-b" id="nettoyage-dashboard"><div class="ld"><div class="sp"></div></div></div>
+    </div>
+  </div>
+  <div class="dr" style="margin-top:18px">
+    <div class="card" style="grid-column:1/-1">
+      <div class="card-h">
+        <div class="card-t">🌡 Courbes Contrôle Froid</div>
+        <select id="chart-sel" style="background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:6px 10px;border-radius:var(--rs);cursor:pointer;outline:none" onchange="renderFroidChart()"><option value="">Tous les appareils</option></select>
+      </div>
+      <div class="card-b" style="height:260px;position:relative"><canvas id="froid-chart"></canvas></div>
+    </div>
+  </div>
+</div>
 
         <!-- MODULES (inchangés) -->
         <div class="panel" id="panel-reception">
@@ -435,12 +547,32 @@ tbody tr:hover{background:var(--sf2)}
     </div>
   </div>
 </div>
-        <div class="panel" id="panel-froid"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('froid',this.value)"/><button class="btn bp" onclick="openAdd('froid')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('froid')">↻</button></div><div class="twrap"><table id="table-froid"><thead><tr><th>ID</th><th>Appareil</th><th>Type</th><th>Date</th><th>Heure</th><th>T°C Mesurée</th><th>T°C Cible</th><th>T°C Crit.</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-        <div class="panel" id="panel-huiles"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('huiles',this.value)"/><button class="btn bp" onclick="openAdd('huiles')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('huiles')">↻</button></div><div class="twrap"><table id="table-huiles"><thead><tr><th>ID</th><th>Date</th><th>Appareil</th><th>Chimique</th><th>Visuel</th><th>Conformité</th><th>Visa</th><th>Action</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="10"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-froid">
+  <div class="tb-bar">
+    <button class="btn bg" onclick="loadModule('froid')">↻ Actualiser</button>
+    <button class="btn bp" id="btn-add-app-froid" onclick="openAddAppareilModal('froid')" style="display:none">＋ Appareil</button>
+  </div>
+  <div id="froid-appareils-list"><div class="ld"><div class="sp"></div></div></div>
+</div>
+        <div class="panel" id="panel-huiles">
+  <div class="tb-bar">
+    <button class="btn bg" onclick="loadModule('huiles')">↻ Actualiser</button>
+    <button class="btn bp" id="btn-add-app-huiles" onclick="openAddAppareilModal('huiles')" style="display:none">＋ Appareil</button>
+  </div>
+  <div id="huiles-appareils-list"><div class="ld"><div class="sp"></div></div></div>
+</div>
         <div class="panel" id="panel-refroidissement"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('refroidissement',this.value)"/><button class="btn bp" onclick="openAdd('refroidissement')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('refroidissement')">↻</button></div><div class="rh">🔹 Règle : <strong>+63°C → +10°C en ≤ 2h</strong></div><div class="twrap"><table id="table-refroidissement"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
         <div class="panel" id="panel-congelation"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('congelation',this.value)"/><button class="btn bp" onclick="openAdd('congelation')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('congelation')">↻</button></div><div class="rh">🔹 Règle : <strong>+10°C → -18°C à cœur, idéalement &lt;4h</strong></div><div class="twrap"><table id="table-congelation"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
         <div class="panel" id="panel-remise"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('remise',this.value)"/><button class="btn bp" onclick="openAdd('remise')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('remise')">↻</button></div><div class="rh">🔹 Règle : <strong>+3°C → ≥+63°C en ≤ 1h</strong> · Ne jamais réchauffer plusieurs fois</div><div class="twrap"><table id="table-remise"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-
+<!-- NETTOYAGE -->
+        <div class="panel" id="panel-nettoyage">
+          <div class="tb-bar">
+            <input type="text" placeholder="Rechercher zone, tâche…" oninput="filterNettoyage(this.value)"/>
+            <button class="btn bp" id="btn-add-zone" onclick="openAddZone()" style="display:none">＋ Nouvelle zone</button>
+            <button class="btn bg" onclick="loadModule('nettoyage')">↻</button>
+          </div>
+          <div id="nettoyage-zones"></div>
+        </div>
         <!-- JOURNAUX HACCP -->
         <div class="panel" id="panel-logs">
           <div class="log-stat-bar">
@@ -481,7 +613,7 @@ tbody tr:hover{background:var(--sf2)}
             <div class="card-b" style="padding:0">
               <div class="twrap" style="border:none;border-radius:0;box-shadow:none">
                 <table id="table-loginlogs">
-                  <thead><tr><th>Date/Heure</th><th>Id</th><th>Nom</th><th>Statut</th><th>Modules consultés</th><th></th></tr></thead>
+                  <thead><tr><th>Date/Heure</th><th>Id</th><th>Nom</th><th>Statut</th><th></th></tr></thead>
                   <tbody><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody>
                 </table>
               </div>
@@ -501,10 +633,10 @@ tbody tr:hover{background:var(--sf2)}
             </div>
             <div class="purge-steps">
               <ol>
-                <li>Toutes les feuilles (Réception, Froid, Huiles, Refroidissement, Congélation, Remise en T°) sont exportées en CSV</li>
+                <li>Toutes les feuilles (Réception, Froid, Huiles, Refroidissement, Congélation, Remise en T°,Historique de nettoyage, log et actionlog) sont exportées en CSV</li>
                 <li>Le fichier CSV est téléchargé sur votre appareil avant toute suppression</li>
                 <li>Un log de clôture est enregistré dans le journal des connexions</li>
-                <li>Toutes les lignes de données sont effacées du Google Sheets (les en-têtes sont conservés)</li>
+                <li>Toutes les lignes de données sont effacées de la base</li>
               </ol>
             </div>
             <div class="purge-confirm-row">
@@ -556,8 +688,7 @@ function saveSession(nom,id,apiUrl,statut,entreprise,mdp){
   API_URL=apiUrl;
   sessionStorage.setItem('easyhy_sess',JSON.stringify(_sess));
 }
-function clearSession(){sessionStorage.removeItem('easyhy_sess');_sess=null;API_URL='';}
-const isAdmin=()=>_sess?.statut==='admin';
+function clearSession(){sessionStorage.removeItem('easyhy_sess');sessionStorage.removeItem('easyhy_logged');_sess=null;API_URL='';}const isAdmin=()=>_sess?.statut==='admin';
 
 /* ── SHOW/HIDE ── */
 function showLogin(){
@@ -581,8 +712,10 @@ const btnVider=document.getElementById('btn-vider-logs');
 if(btnVider)btnVider.style.display=isAdmin()?'':'none';
   initBubbles();
   loadAllAppareils().then(()=>loadDashboard());
-  // Log connexion
-  logLogin();
+  if(!sessionStorage.getItem('easyhy_logged')){
+    sessionStorage.setItem('easyhy_logged','1');
+    logLogin();
+  }
 }
 
 /* ── LOGIN ── */
@@ -670,6 +803,7 @@ const MM={
   refroidissement:{label:'Refroidissement',icon:'🌡',col:'#7c3aed',col2:'#a78bfa'},
   congelation:{label:'Congélation',icon:'🧊',col:'#0369a1',col2:'#7dd3fc'},
   remise:{label:'Remise en T°',icon:'♨️',col:'#dc2626',col2:'#fb923c'},
+nettoyage:{label:'Nettoyage',icon:'🧹',col:'#0d9488',col2:'#2dd4bf'},
 };
 
 /* ── UTILS ── */
@@ -778,7 +912,7 @@ async function loadDashboard(){
     return`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span style="font-weight:600">${mt.icon} ${mt.label}</span><span style="color:var(--mu)">${m.conforme}/${m.total}</span></div><div style="height:7px;background:var(--sf3);border-radius:4px;overflow:hidden;border:1px solid var(--bd)"><div style="height:100%;width:${pp}%;background:${c};border-radius:4px;transition:width .6s ease"></div></div></div>`;
   }).join('');
   Object.entries(dash).forEach(([k,m])=>{const b=document.getElementById('b-'+k);if(b){b.textContent=m.nonRegle;b.classList.toggle('on',m.nonRegle>0);}});
-  renderNCOpen();await loadFroidChart();updateThermoWidget();
+  renderNCOpen();await loadFroidChart();updateThermoWidget();updateNettoyageBadge();renderNettoyageDashboard();renderAppareilsDashboard();
 }
 async function renderNCOpen(){
   const list=document.getElementById('nc-list');
@@ -788,7 +922,7 @@ async function renderNCOpen(){
   const bls=await GET({action:'getBLGrouped'});
   if(bls)bls.filter(bl=>bl.conformite==='Non conforme'&&bl.nonRegle).forEach(bl=>all.push({ID_NC:bl.ID_BL,Date:bl.Date,_m:'reception'}));
   // Autres modules
-  for(const k of Object.keys(MM).filter(k=>k!=='reception')){
+  for(const k of Object.keys(MM).filter(k=>k!=='reception'&&k!=='nettoyage')){
     const rows=await GET({action:'getAll',module:k});if(!rows)continue;
     rows.filter(r=>String(r['Conformité']||'').toLowerCase()==='non conforme'&&(!r['Réglé/Non-réglé']||String(r['Réglé/Non-réglé']).toLowerCase().includes('non'))).forEach(r=>all.push({...r,_m:k}));
   }
@@ -808,7 +942,7 @@ function renderFroidChart(){
   const data=(flt?rows.filter(r=>r['Appareil']===flt):rows).filter(r=>r['Date']).sort((a,b)=>new Date(a['Date'])-new Date(b['Date']));
   const apps=[...new Set(data.map(r=>r['Appareil']).filter(Boolean))];
   const C=['#2563eb','#0891b2','#d97706','#dc2626','#7c3aed','#0369a1'];
-  const datasets=apps.map((app,i)=>({label:app,data:data.filter(r=>r['Appareil']===app).map(r=>({x:r['Date']+(r['Heure']?' '+r['Heure']:''),y:r['T°C entrée']!==''?parseFloat(r['T°C entrée']):null})).filter(p=>p.y!==null),borderColor:C[i%C.length],backgroundColor:C[i%C.length]+'18',borderWidth:2.5,pointRadius:4,tension:.4,fill:false}));
+  const datasets=apps.map((app,i)=>({label:app,data:data.filter(r=>r['Appareil']===app).map(r=>({x:r['Date'],y:r['T°C entrée']!==''?parseFloat(r['T°C entrée']):null})).filter(p=>p.y!==null),borderColor:C[i%C.length],backgroundColor:C[i%C.length]+'18',borderWidth:2.5,pointRadius:4,tension:.4,fill:false}));
   const ctx=document.getElementById('froid-chart').getContext('2d');
   if(S.chart)S.chart.destroy();
   S.chart=new Chart(ctx,{type:'line',data:{datasets},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#6b85a8',font:{family:'Plus Jakarta Sans',size:11,weight:'600'}}},tooltip:{backgroundColor:'#fff',borderColor:'#d0e0f7',borderWidth:1.5,titleColor:'#0f2447',bodyColor:'#6b85a8',padding:10,cornerRadius:8}},scales:{x:{ticks:{color:'#6b85a8',font:{size:10}},grid:{color:'#e8f0fe'}},y:{ticks:{color:'#6b85a8',font:{size:10},callback:v=>v+'°C'},grid:{color:'#e8f0fe'}}}}});
@@ -1020,7 +1154,7 @@ function renderLoginLogs(){
   const logs=srch?S.loginLogs.filter(l=>Object.values(l).some(v=>String(v).toLowerCase().includes(srch))):S.loginLogs;
   document.getElementById('ll-count').textContent=logs.length+' connexion'+(logs.length>1?'s':'');
   const tb=document.querySelector('#table-loginlogs tbody');
-  if(!logs.length){tb.innerHTML=`<tr><td colspan="6"><div class="empty"><div class="ei">🔑</div><p>Aucune connexion enregistrée</p></div></td></tr>`;return;}
+  if(!logs.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="ei">🔑</div><p>Aucune connexion enregistrée</p></div></td></tr>`;return;}
   tb.innerHTML=logs.map(l=>{
     const isAd=l['Statut']==='admin';
     return`<tr>
@@ -1028,7 +1162,6 @@ function renderLoginLogs(){
       <td><code style="color:var(--bl);background:rgba(37,99,235,.08);padding:2px 6px;border-radius:4px;font-size:11px">${esc(l['UserId']||'')}</code></td>
       <td style="font-weight:600">${esc(l['UserNom']||'')}</td>
       <td><span class="badge ${isAd?'bpu':'bsk'}">${isAd?'Admin':'Employé'}</span></td>
-      <td style="color:var(--mu);font-size:11px">${esc(l['Modules consultés']||'—')}</td>
       ${isAdmin()?`<td><button class="btn bd2 sm" onclick="deleteLoginLog('${esc(l['Timestamp']||'')}','${esc(l['UserId']||'')}')">🗑</button></td>`:'<td></td>'}
     </tr>`;
   }).join('');
@@ -1043,7 +1176,7 @@ async function doPurge(){
   const fill=document.getElementById('purge-fill');
   const txt=document.getElementById('purge-progress-text');
   prog.classList.add('on');
-  const modules=Object.keys(MM);
+  const modules=Object.keys(MM).filter(m=>m!=='nettoyage');
   const allData={};
   // 1. Récupérer toutes les données
   for(let i=0;i<modules.length;i++){
@@ -1053,7 +1186,7 @@ async function doPurge(){
     allData[m]=rows||[];
   }
   // 2. Construire le CSV
-  txt.textContent='Génération du fichier CSV…';fill.style.width='55%';
+  txt.textContent='Export journaux et historique nettoyage…';fill.style.width='52%';
   const ts=new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
   const csvLines=['EasyHygie — Export de clôture — '+ts,''];
   for(const m of modules){
@@ -1064,9 +1197,33 @@ async function doPurge(){
     rows.forEach(r=>csvLines.push(keys.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
     csvLines.push('');
   }
+const actionLogs=await GET({action:'getActionLogs'});
+if(actionLogs&&actionLogs.length){
+  csvLines.push('=== Journal d\'activité ===');
+  const keysA=Object.keys(actionLogs[0]).filter(k=>!k.startsWith('_'));
+  csvLines.push(keysA.map(k=>'"'+k+'"').join(','));
+  actionLogs.forEach(r=>csvLines.push(keysA.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
+  csvLines.push('');
+}
+const loginLogs=await GET({action:'getLoginLogs'});
+if(loginLogs&&loginLogs.length){
+  csvLines.push('=== Journal des connexions ===');
+  const keysL=Object.keys(loginLogs[0]).filter(k=>!k.startsWith('_'));
+  csvLines.push(keysL.map(k=>'"'+k+'"').join(','));
+  loginLogs.forEach(r=>csvLines.push(keysL.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
+  csvLines.push('');
+}
+const histoNet=await GET({action:'getNettoyageHistorique'});
+if(histoNet&&histoNet.length){
+  csvLines.push('=== Historique Nettoyage ===');
+  const keysN=Object.keys(histoNet[0]).filter(k=>!k.startsWith('_'));
+  csvLines.push(keysN.map(k=>'"'+k+'"').join(','));
+  histoNet.forEach(r=>csvLines.push(keysN.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
+  csvLines.push('');
+}
   // 3. Télécharger
   txt.textContent='Téléchargement…';fill.style.width='65%';
-  const blob=new Blob([csvLines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\uFEFF'+csvLines.join('\n')],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='EasyHygie_Cloture_'+ts+'.csv';a.click();
   URL.revokeObjectURL(url);
@@ -1078,7 +1235,11 @@ async function doPurge(){
     await POST({action:'purgeModule',module:m});
   }
   // Purger aussi les LoginLogs
-  await POST({action:'purgeLoginLogs'});
+  txt.textContent='Purge journaux…';fill.style.width='92%';
+await POST({action:'purgeLoginLogs'});
+await POST({action:'purgeActionLogs'});
+txt.textContent='Purge historique nettoyage…';fill.style.width='96%';
+await POST({action:'purgeNettoyageHistorique'});
   fill.style.width='100%';txt.textContent='Clôture terminée ✅';
   sendLog('purge','all','','','Clôture de période — export CSV');
   // Log de clôture dans le backend HACCP
@@ -1162,10 +1323,25 @@ async function subRes(mod,id){const act=document.getElementById('res-act')?.valu
 
 /* ── TOAST ── */
 function toast(msg,t='info'){const icons={success:'✅',error:'❌',info:'ℹ️'};const el=document.createElement('div');el.className='toast '+t;el.innerHTML=`<span>${icons[t]}</span><span>${msg}</span>`;document.getElementById('tc').appendChild(el);setTimeout(()=>el.remove(),3800);}
-
+function toggleSidebar(){
+  document.querySelector('aside').classList.toggle('open');
+  document.getElementById('sidebar-overlay').classList.toggle('on');
+}
+// Fermer sidebar quand on clique sur un item
+document.querySelectorAll('.ni').forEach(ni=>{
+  ni.addEventListener('click',()=>{
+    if(window.innerWidth<=768){
+      document.querySelector('aside').classList.remove('open');
+      document.getElementById('sidebar-overlay').classList.remove('on');
+    }
+  });
+});
 /* ── INIT ── */
 window.addEventListener('DOMContentLoaded',()=>{
   if(loadSession()){showApp();}else{showLogin();}
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  }
 });
 // ── État BL ──────────────────────────────────────────────────
 let _blData = []; // tous les BL groupés
@@ -1173,6 +1349,9 @@ let _blData = []; // tous les BL groupés
 // ── Surcharge loadModule pour reception ──────────────────────
 async function loadModule(m) {
   if (m === 'reception') { await loadBL(); return; }
+  if (m === 'nettoyage') { await loadNettoyage(); return; }
+  if (m === 'froid') { await loadModule_appareils('froid'); return; }
+  if (m === 'huiles') { await loadModule_appareils('huiles'); return; }
   const tb=document.querySelector(`#table-${m} tbody`);
   tb.innerHTML=`<tr><td colspan="20"><div class="ld"><div class="sp"></div></div></td></tr>`;
   const rows=await GET({action:'getAll',module:m});
@@ -1497,6 +1676,576 @@ async function subResLigne(ligneId) {
   loadModule('reception');
   loadDashboard();
   sendLog('resolveNC', 'reception', ligneId, 'Réglé', act);
+}
+/* ── NETTOYAGE ── */
+let _nettoyageData=[];
+
+async function loadNettoyage(){
+  document.getElementById('nettoyage-zones').innerHTML='<div class="ld"><div class="sp"></div></div>';
+  const btnAdd=document.getElementById('btn-add-zone');
+if(btnAdd)btnAdd.style.display=isAdmin()?'':'none';
+  const plan=await GET({action:'getNettoyagePlan'});
+  if(!plan)return;
+  _nettoyageData=plan;
+  renderNettoyage(plan);
+  const enRetard=plan.filter(t=>_nettoyageStatut(t)==='retard').length;
+  const b=document.getElementById('b-nettoyage');
+  if(b){b.textContent=enRetard;b.classList.toggle('on',enRetard>0);}
+}
+
+function _nettoyageStatut(t){
+  if(!t['Prochaine échéance'])return'ok';
+  const today=new Date();today.setHours(0,0,0,0);
+  const d=new Date(t['Prochaine échéance']);d.setHours(0,0,0,0);
+  const diff=(d-today)/(1000*60*60*24);
+  if(diff<0)return'retard';
+  if(diff<=1)return'urgent';
+  return'ok';
+}
+
+function renderNettoyage(plan){
+  const zones={};
+  plan.forEach(t=>{if(!zones[t['Zone']])zones[t['Zone']]=[];zones[t['Zone']].push(t);});
+  const container=document.getElementById('nettoyage-zones');
+  if(!plan.length){container.innerHTML='<div class="empty"><div class="ei">🧹</div><p>Aucune tâche de nettoyage</p></div>';return;}
+  container.innerHTML=Object.entries(zones).map(([zone,taches])=>`<div class="card" style="margin-bottom:18px">
+    <div class="card-h">
+  <div class="card-t">🏠 ${esc(zone)}</div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:11px;color:var(--mu)">${taches.length} élément${taches.length>1?'s':''}</span>
+    ${isAdmin()?`<button class="btn bp sm" onclick="openAddElement('${esc(zone)}')">＋ Élément</button>`:''}
+  </div>
+</div>
+    <div class="card-b" style="padding:0"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <thead><tr>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Tâche</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Produit</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Fréquence</th>
+ <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Dernière exéc.</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Prochaine échéance</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Statut</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Actions</th>
+      </tr></thead>
+      <tbody>${taches.map(t=>{
+        const st=_nettoyageStatut(t);
+        const joursRestants=t['Prochaine échéance']?Math.ceil((new Date(t['Prochaine échéance'])-new Date())/(1000*60*60*24)):null;
+const stBadge=st==='retard'?'<span class="badge bnc">⚠️ En retard</span>':st==='urgent'?'<span class="badge bw">🔔 À faire aujourd\'hui</span>':joursRestants===1?'<span class="badge bsk">Dans 1 jour</span>':`<span class="badge bok">Dans ${joursRestants} jours</span>`;
+        const dateAff=t['Prochaine échéance']?t['Prochaine échéance'].split('-').reverse().join('/'):'—';
+        const derniere=t['Dernière exécution']?String(t['Dernière exécution']).split('-').reverse().join('/'):'Jamais';
+return`<tr style="border-bottom:1px solid var(--bd2)">
+  <td style="padding:10px 14px;font-weight:600">${esc(t['Tâche']||'')}</td>
+  <td style="padding:10px 14px;color:var(--mu)">${esc(t['Produit']||'—')}</td>
+  <td style="padding:10px 14px"><span class="badge bsk">${esc(t['Fréquence']||'')}</span></td>
+  <td style="padding:10px 14px;font-family:var(--fm);font-size:11px;color:var(--mu)">${derniere}</td>
+  <td style="padding:10px 14px;font-family:var(--fm);font-size:11px">${dateAff}</td>
+  <td style="padding:10px 14px">${stBadge}</td>
+  <td style="padding:10px 14px"><div style="display:flex;gap:4px">
+    <button class="btn bp sm" onclick="openEffectuerTache('${esc(t['ID_Tache'])}')">🧹 Faire</button>
+    <button class="btn bg sm" onclick="openHistoTache('${esc(t['ID_Tache'])}','${esc(t['Tâche'])}')">📋</button>
+            ${isAdmin()?`<button class="btn bg sm" onclick="openEditTache('${esc(t['ID_Tache'])}')">✏️</button>`:''}
+            ${isAdmin()?`<button class="btn bd2 sm" onclick="deleteTache('${esc(t['ID_Tache'])}')">🗑</button>`:''}
+  </div></td>
+</tr>`;
+      }).join('')}</tbody>
+    </table></div>
+  </div>`).join('');
+}
+
+function filterNettoyage(q){
+  const fq=q.toLowerCase();
+  renderNettoyage(fq?_nettoyageData.filter(t=>Object.values(t).some(v=>String(v).toLowerCase().includes(fq))):_nettoyageData);
+}
+
+function openAddZone(){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  document.getElementById('mt').textContent='＋ Nouvelle zone';
+  document.getElementById('mb').innerHTML=`<div class="fg">
+    <div class="field full"><label>Nom de la zone *</label><input type="text" name="Zone" placeholder="Ex: Cuisine, Salle, WC…"/></div>
+    <div class="field full"><label>Premier élément à nettoyer *</label><input type="text" name="Tâche" placeholder="Ex: Sol, Plan de travail, Friteuse…"/></div>
+    <div class="field"><label>Produit</label><input type="text" name="Produit" placeholder="Ex: Eau de javel…"/></div>
+    <div class="field"><label>Fréquence *</label><select name="Fréquence"><option value="">—</option><option value="Quotidien">Quotidien</option><option value="Hebdomadaire">Hebdomadaire</option><option value="Mensuel">Mensuel</option></select></div>
+  </div>`;
+  document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subAddZone()">💾 Créer</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+
+async function subAddZone(){
+  const data={};
+  document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value)data[el.getAttribute('name')]=el.value.trim();});
+  if(!data['Zone']){toast('Zone obligatoire','error');return;}
+  if(!data['Tâche']){toast('Élément obligatoire','error');return;}
+  if(!data['Fréquence']){toast('Fréquence obligatoire','error');return;}
+  const r=await POST({action:'addTache',data});
+  if(!r)return;
+  toast('Zone créée ✅','success');clom();loadModule('nettoyage');
+}
+
+function openAddElement(zone){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  document.getElementById('mt').textContent='＋ Ajouter un élément — '+esc(zone);
+  document.getElementById('mb').innerHTML=`<div class="fg">
+    <div class="field full"><label>Élément à nettoyer *</label><input type="text" name="Tâche" placeholder="Ex: Sol, Plan de travail…"/></div>
+    <div class="field"><label>Produit</label><input type="text" name="Produit" placeholder="Ex: Eau de javel…"/></div>
+    <div class="field"><label>Fréquence *</label><select name="Fréquence"><option value="">—</option><option value="Quotidien">Quotidien</option><option value="Hebdomadaire">Hebdomadaire</option><option value="Mensuel">Mensuel</option></select></div>
+    <input type="hidden" name="Zone" value="${esc(zone)}"/>
+  </div>`;
+  document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subAddElement()">💾 Ajouter</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+
+async function subAddElement(){
+  const data={};
+  document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value)data[el.getAttribute('name')]=el.value.trim();});
+  if(!data['Tâche']){toast('Élément obligatoire','error');return;}
+  if(!data['Fréquence']){toast('Fréquence obligatoire','error');return;}
+  const r=await POST({action:'addTache',data});
+  if(!r)return;
+  toast('Élément ajouté ✅','success');clom();loadModule('nettoyage');
+}
+function openEditTache(id){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  const t=_nettoyageData.find(t=>t['ID_Tache']===id);
+  if(!t)return;
+  document.getElementById('mt').textContent='✏️ Modifier — '+esc(t['Tâche']);
+  document.getElementById('mb').innerHTML=`<div class="fg">
+    <div class="field full"><label>Élément *</label><input type="text" name="Tâche" value="${esc(t['Tâche']||'')}"/></div>
+    <div class="field"><label>Produit</label><input type="text" name="Produit" value="${esc(t['Produit']||'')}"/></div>
+    <div class="field"><label>Fréquence *</label><select name="Fréquence">
+      <option value="Quotidien" ${t['Fréquence']==='Quotidien'?'selected':''}>Quotidien</option>
+      <option value="Hebdomadaire" ${t['Fréquence']==='Hebdomadaire'?'selected':''}>Hebdomadaire</option>
+      <option value="Mensuel" ${t['Fréquence']==='Mensuel'?'selected':''}>Mensuel</option>
+    </select></div>
+  </div>`;
+  document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subEditTache('${esc(id)}')">💾 Enregistrer</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+
+async function subEditTache(id){
+  const data={};
+  document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value)data[el.getAttribute('name')]=el.value.trim();});
+  if(!data['Tâche']){toast('Élément obligatoire','error');return;}
+  if(!data['Fréquence']){toast('Fréquence obligatoire','error');return;}
+  const r=await POST({action:'updateTache',id,data});
+  if(!r)return;
+  toast('Mis à jour ✅','success');clom();loadModule('nettoyage');
+}
+async function deleteTache(id){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  if(!confirm('Supprimer cette tâche ?'))return;
+  const r=await POST({action:'deleteTache',id});
+  if(!r)return;
+  toast('Supprimé','info');loadModule('nettoyage');
+}
+
+function openEffectuerTache(id){
+  const t=_nettoyageData.find(t=>t['ID_Tache']===id);
+  if(!t)return;
+  document.getElementById('mt').textContent='✅ Effectuer — '+esc(t['Tâche']);
+  document.getElementById('mb').innerHTML=`<div class="fg">
+    <div class="field full"><label>Exécuté par</label><input type="text" name="executePar" value="${esc(_sess?.nom||'')}"/></div>
+    <div class="field full"><label>Produit utilisé</label><input type="text" name="produitUtilise" value="${esc(t['Produit']||'')}"/></div>
+    <div class="field full"><label>Observations</label><textarea name="observations" placeholder="Optionnel…"></textarea></div>
+  </div>`;
+  document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subEffectuerTache('${esc(id)}')">✅ Confirmer</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+
+async function subEffectuerTache(id){
+  const data={};
+  document.querySelectorAll('#mb [name]').forEach(el=>{data[el.getAttribute('name')]=el.value.trim();});
+  const r=await POST({action:'effectuerTache',id,data});
+  if(!r)return;
+  toast('Nettoyage enregistré ✅','success');clom();loadModule('nettoyage');
+  sendLog('add','nettoyage',id,'Conforme','');
+}
+
+async function openHistoTache(id,nom){
+  document.getElementById('mt').textContent='📋 Historique — '+esc(nom);
+  document.getElementById('mb').innerHTML='<div class="ld"><div class="sp"></div></div>';
+  document.getElementById('mf').innerHTML='<button class="btn bg" onclick="clom()">Fermer</button>';
+  document.getElementById('mov').classList.add('open');
+  const histo=await GET({action:'getNettoyageHistorique'});
+  if(!histo){document.getElementById('mb').innerHTML='<div class="empty"><div class="ei">📋</div><p>Aucun passage</p></div>';return;}
+  const filtered=histo.filter(h=>h['ID_Tache']===id);
+  if(!filtered.length){document.getElementById('mb').innerHTML='<div class="empty"><div class="ei">📋</div><p>Aucun passage enregistré</p></div>';return;}
+  document.getElementById('mb').innerHTML=`<div class="twrap"><table style="width:100%">
+    <thead><tr><th>Date</th><th>Heure</th><th>Par</th><th>Produit</th><th>Observations</th></tr></thead>
+    <tbody>${filtered.map(h=>`<tr>
+      <td style="font-family:var(--fm);font-size:11px">${String(h['Date']||'').split('-').reverse().join('/')}</td>
+      <td style="font-family:var(--fm);font-size:11px">${h['Heure']||''}</td>
+      <td style="font-weight:600">${esc(h['Exécuté par']||'')}</td>
+      <td style="color:var(--mu)">${esc(h['Produit utilisé']||'')}</td>
+      <td style="color:var(--mu);font-size:11px">${esc(h['Observations']||'—')}</td>
+    </tr>`).join('')}
+    </tbody>
+  </table></div>`;
+}
+
+async function updateNettoyageBadge(){
+  const plan=await GET({action:'getNettoyagePlan'});
+  if(!plan)return;
+  const enRetard=plan.filter(t=>_nettoyageStatut(t)==='retard').length;
+  const b=document.getElementById('b-nettoyage');
+  if(b){b.textContent=enRetard;b.classList.toggle('on',enRetard>0);}
+}
+async function renderNettoyageDashboard(){
+  const plan=await GET({action:'getNettoyagePlan'});
+  const el=document.getElementById('nettoyage-dashboard');
+  if(!el)return;
+  if(!plan||!plan.length){el.innerHTML='<div class="empty"><div class="ei">🧹</div><p>Aucune tâche configurée</p></div>';return;}
+  const retard=plan.filter(t=>_nettoyageStatut(t)==='retard');
+  const urgent=plan.filter(t=>_nettoyageStatut(t)==='urgent');
+  const alertes=[...retard,...urgent];
+  if(!alertes.length){el.innerHTML='<div class="empty"><div class="ei">✅</div><p>Toutes les tâches sont à jour</p></div>';return;}
+  el.innerHTML=alertes.map(t=>{
+    const st=_nettoyageStatut(t);
+    const dateAff=t['Prochaine échéance']?t['Prochaine échéance'].split('-').reverse().join('/'):'—';
+    return`<div class="nc-row">
+      <span style="font-size:18px">${st==='retard'?'🔴':'🟠'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:12.5px">${esc(t['Tâche']||'')}</div>
+        <div style="font-size:11px;color:var(--mu)">${esc(t['Zone']||'')} · ${esc(t['Fréquence']||'')} · échéance ${dateAff}</div>
+      </div>
+      <span class="badge ${st==='retard'?'bnc':'bw'}">${st==='retard'?'En retard':'Aujourd\'hui'}</span>
+    </div>`;
+  }).join('');
+}
+async function renderAppareilsDashboard(){
+  const el=document.getElementById('appareils-dashboard');
+  if(!el)return;
+  const [froid,huiles]=await Promise.all([
+    GET({action:'getAppareils',type:'froid'}),
+    GET({action:'getAppareils',type:'huiles'})
+  ]);
+  const tous=[...(froid||[]),...(huiles||[])];
+const alertes=tous.filter(a=>_appareilStatut(a)==='retard');
+  if(!alertes.length){el.innerHTML='<div class="empty"><div class="ei">✅</div><p>Tous les appareils sont à jour</p></div>';return;}
+  el.innerHTML=alertes.map(a=>{
+    const st=_appareilStatut(a);
+    const derniere=a.derniereVerif?String(a.derniereVerif).slice(0,10).split('-').reverse().join('/'):'—';
+    const badge=st==='retard'?'<span class="badge bnc">⚠️ En retard</span>':
+                st==='urgent'?'<span class="badge bw">🔔 Aujourd\'hui</span>':
+                '<span class="badge bgr">Jamais contrôlé</span>';
+    return`<div class="nc-row">
+      <span style="font-size:18px">${a.type==='froid'?'❄️':'🛢'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:600;font-size:12.5px">${esc(a.nom)}</div>
+        <div style="font-size:11px;color:var(--mu)">${a.type==='froid'?'Contrôle Froid':'Huiles'} · ${esc(a.frequence)} · dernier: ${derniere}</div>
+      </div>
+      ${badge}
+      <button class="btn bg sm" onclick="showPanel('${a.type}',document.querySelector('[data-p=${a.type}]'))">→</button>
+    </div>`;
+  }).join('');
+}
+/* ── APPAREILS VUE ── */
+let _appareilsData = {froid:[], huiles:[]};
+
+async function loadModule_appareils(type) {
+  const container = document.getElementById(type+'-appareils-list');
+  container.innerHTML = '<div class="ld"><div class="sp"></div></div>';
+  const btnAdd = document.getElementById('btn-add-app-'+type);
+  if(btnAdd) btnAdd.style.display = isAdmin() ? '' : 'none';
+  const appareils = await GET({action:'getAppareils', type});
+  if(!appareils) return;
+  _appareilsData[type] = appareils;
+  renderAppareilsList(type, appareils);
+}
+
+function _appareilStatut(app) {
+  if(!app.prochaineVerif) return 'jamais';
+  const today = new Date(); today.setHours(0,0,0,0);
+  const d = new Date(app.prochaineVerif); d.setHours(0,0,0,0);
+  const diff = (d - today) / (1000*60*60*24);
+  if(diff < 0) return 'retard';
+  if(diff === 0) return 'urgent';
+  return 'ok';
+}
+
+function renderAppareilsList(type, appareils) {
+  const container = document.getElementById(type+'-appareils-list');
+  if(!appareils.length) {
+    container.innerHTML = '<div class="empty"><div class="ei">'+(type==='froid'?'❄️':'🛢')+'</div><p>Aucun appareil configuré</p></div>';
+    return;
+  }
+  const icon = type==='froid'?'❄️':'🛢';
+  container.innerHTML = `<div class="card">
+    <div class="card-b" style="padding:0">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+        <thead><tr>
+          <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Appareil</th>
+          <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Fréquence</th>
+          <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Dernier contrôle</th>
+          <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Prochain contrôle</th>
+          <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Statut</th>
+          <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Actions</th>
+        </tr></thead>
+        <tbody>
+          ${appareils.map(app => {
+            const st = _appareilStatut(app);
+            const joursRestants = app.prochaineVerif ? Math.ceil((new Date(app.prochaineVerif)-new Date())/(1000*60*60*24)) : null;
+            const stBadge = st==='retard' ? '<span class="badge bnc">⚠️ En retard</span>' :
+                            st==='urgent' ? '<span class="badge bw">🔔 Aujourd\'hui</span>' :
+                            st==='jamais' ? '<span class="badge bgr">Jamais contrôlé</span>' :
+                            joursRestants===1 ? '<span class="badge bsk">Dans 1 jour</span>' :
+                            `<span class="badge bok">Dans ${joursRestants} jours</span>`;
+            const derniere = app.derniereVerif ? String(app.derniereVerif).slice(0,10).split('-').reverse().join('/') : '—';
+const prochaine = app.prochaineVerif ? String(app.prochaineVerif).slice(0,10).split('-').reverse().join('/') : '—';
+            return `<tr style="border-bottom:1px solid var(--bd2)">
+              <td style="padding:10px 14px">
+  <div style="font-weight:600">${icon} ${esc(app.nom)}</div>
+  ${app.notes?`<div style="font-size:11px;color:var(--mu);margin-top:2px">${esc(app.notes)}</div>`:''}
+</td>
+              <td style="padding:10px 14px"><span class="badge bsk">${esc(app.frequence)}</span></td>
+              <td style="padding:10px 14px;font-family:var(--fm);font-size:11px;color:var(--mu)">${derniere}</td>
+              <td style="padding:10px 14px;font-family:var(--fm);font-size:11px">${prochaine}</td>
+              <td style="padding:10px 14px">${stBadge}</td>
+              <td style="padding:10px 14px"><div style="display:flex;gap:4px">
+                <button class="btn bp sm" onclick="openAppareilModal('${type}','${esc(app.nom)}')">📋 Relevés</button>
+                ${isAdmin()?`<button class="btn bg sm" onclick="openEditAppareil('${type}','${esc(app.nom)}')">✏️</button>`:''}
+                ${isAdmin()?`<button class="btn bd2 sm" onclick="deleteAppareil('${type}','${esc(app.nom)}')">🗑</button>`:''}
+              </div></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+async function openAppareilModal(type, nom) {
+  document.getElementById('mt').textContent = (type==='froid'?'❄️':'🛢')+' '+esc(nom)+' — Relevés';
+  document.getElementById('mb').innerHTML = '<div class="ld"><div class="sp"></div></div>';
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="clom()">Fermer</button>
+    <button class="btn bp" onclick="openAddReleve('${esc(type)}','${esc(nom)}')">＋ Nouveau relevé</button>
+  `;
+  document.getElementById('mov').classList.add('open');
+  const rows = await GET({action:'getAll', module:type});
+  if(!rows){document.getElementById('mb').innerHTML='<div class="empty"><div class="ei">📋</div><p>Aucun relevé</p></div>';return;}
+  S.data[type] = rows;
+  const filtered = rows.filter(r=>r['Appareil']===nom).slice(0,20);
+  if(!filtered.length){document.getElementById('mb').innerHTML='<div class="empty"><div class="ei">📋</div><p>Aucun relevé pour cet appareil</p></div>';return;}
+
+  if(type==='froid'){
+    document.getElementById('mb').innerHTML=`<div class="twrap"><table style="width:100%">
+      <thead><tr><th>Date</th><th>Heure</th><th>Type</th><th>T°C</th><th>Conformité</th><th>Statut</th>${isAdmin()?'<th></th>':''}</tr></thead>
+      <tbody>${filtered.map(r=>`<tr>
+        <td style="font-family:var(--fm);font-size:11px">${r['Date']||''}</td>
+        <td style="font-family:var(--fm);font-size:11px">${r['Heure']||''}</td>
+        <td>${r['Type_controle']||''}</td>
+        <td style="font-weight:600">${r['T°C entrée']!==''?r['T°C entrée']+'°C':'—'}</td>
+        <td>${CB(r['Conformité'])}</td>
+        <td>${String(r['Conformité']||'').toLowerCase()==='conforme'?'<span class="badge bok">OK</span>':RB(r['Réglé/Non-réglé'])}</td>
+        ${isAdmin()?`<td><button class="btn bd2 sm" onclick="delRow('froid','${esc(r['ID_NC'])}');openAppareilModal('froid','${esc(nom)}')">🗑</button></td>`:''}
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  } else {
+    document.getElementById('mb').innerHTML=`<div class="twrap"><table style="width:100%">
+      <thead><tr><th>Date</th><th>Chimique</th><th>Visuel</th><th>Conformité</th><th>Statut</th>${isAdmin()?'<th></th>':''}</tr></thead>
+      <tbody>${filtered.map(r=>`<tr>
+        <td style="font-family:var(--fm);font-size:11px">${r['Date']||''}</td>
+        <td>${CB(r['Contrôle chimique'])}</td>
+        <td>${CB(r['Contrôle visuel'])}</td>
+        <td>${CB(r['Conformité'])}</td>
+        <td>${String(r['Conformité']||'').toLowerCase()==='conforme'?'<span class="badge bok">OK</span>':RB(r['Réglé/Non-réglé'])}</td>
+        ${isAdmin()?`<td><button class="btn bd2 sm" onclick="delRow('huiles','${esc(r['ID_NC'])}');openAppareilModal('huiles','${esc(nom)}')">🗑</button></td>`:''}
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+}
+
+function openAddReleve(type, nom) {
+  const app = _appareilsData[type].find(a=>a.nom===nom);
+  document.getElementById('mt').textContent = '＋ Nouveau relevé — '+esc(nom);
+  
+  if(type==='froid'){
+    const typeCtrl = app?.typeControle||'Frigo';
+    const cible = app?.tempCible!==''&&app?.tempCible!==undefined?app?.tempCible:(typeCtrl==='Frigo'?2.5:-18);
+const critique = app?.tempCritique!==''&&app?.tempCritique!==undefined?app?.tempCritique:(typeCtrl==='Frigo'?4:-16);
+    document.getElementById('mb').innerHTML=`<div class="fg">
+      <div class="field"><label>Date</label><input type="date" name="Date" value="${today()}"/></div>
+      ${tfF('Heure','Heure du relevé',nowT())}
+      <div class="field full"><label>T°C Mesurée *</label><input type="number" step="0.1" name="T°C entrée" id="ar_te" oninput="arCalcFroid(${critique},'${typeCtrl}')"/></div>
+      <div class="field"><label>T°C Cible</label><div class="fro inf">${cible}°C</div><input type="hidden" name="T°C cible" value="${cible}"/></div>
+      <div class="field"><label>T°C Critique</label><div class="fro" style="color:var(--wn)">${critique}°C</div><input type="hidden" name="T°C critique" value="${critique}"/></div>
+      <input type="hidden" name="Type_controle" value="${typeCtrl}"/>
+      <div class="field full"><label>Conformité (auto)</label><div class="fro" id="ar_conf">—</div><input type="hidden" name="Conformité" id="ar_ch" value=""/></div>
+      <div id="ar_ncw" style="display:none" class="full fg">
+        <div class="field full"><label>Action corrective *</label><textarea name="Action"></textarea></div>
+        <div class="field full"><label>Réglé/Non-réglé *</label>
+          <select name="Réglé/Non-réglé" id="ar_rgl"><option value="">—</option><option value="Non-réglé">Non-réglé</option><option value="Réglé">Réglé</option></select>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    document.getElementById('mb').innerHTML=`<div class="fg">
+      <div class="field full"><label>Date</label><input type="date" name="Date" value="${today()}"/></div>
+      <div class="field full"><label>Visa</label><input type="text" name="Visa" value="${_sess?.nom||''}"/></div>
+      <div class="field"><label>Contrôle chimique *</label>
+        <select name="Contrôle chimique" id="ar_chim" onchange="arCalcHuiles()">
+          <option value="">—</option>
+          <option value="Conforme">Conforme</option>
+          <option value="Non conforme">Non conforme</option>
+          <option value="Non réalisé">Non réalisé</option>
+        </select>
+      </div>
+      <div class="field"><label>Contrôle visuel *</label>
+        <select name="Contrôle visuel" id="ar_vis" onchange="arCalcHuiles()">
+          <option value="">—</option>
+          <option value="Conforme">Conforme</option>
+          <option value="Non conforme">Non conforme</option>
+          <option value="Non réalisé">Non réalisé</option>
+        </select>
+      </div>
+      <div class="field full"><label>Conformité (auto)</label><div class="fro" id="ar_conf">—</div><input type="hidden" name="Conformité" id="ar_ch" value=""/></div>
+      <div id="ar_ncw" style="display:none" class="full fg">
+        <div class="field full"><label>Action corrective *</label><textarea name="Action"></textarea></div>
+        <div class="field full"><label>Réglé/Non-réglé *</label>
+          <select name="Réglé/Non-réglé" id="ar_rgl"><option value="">—</option><option value="Non-réglé">Non-réglé</option><option value="Réglé">Réglé</option></select>
+        </div>
+      </div>
+    </div>`;
+  }
+  
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="openAppareilModal('${esc(type)}','${esc(nom)}')">← Retour</button>
+    <button class="btn bp" onclick="subAddReleve('${esc(type)}','${esc(nom)}')">💾 Enregistrer</button>
+  `;
+}
+
+function arCalcFroid(critique, typeCtrl){
+  const tv=document.getElementById('ar_te')?.value;
+  if(tv===''||tv===undefined){document.getElementById('ar_conf').textContent='—';document.getElementById('ar_ch').value='';document.getElementById('ar_ncw').style.display='none';return;}
+  const t=parseFloat(tv);
+  const c=parseFloat(critique);
+  const nc = typeCtrl==='Congélateur' ? t>c : t>c;
+  const conf=nc?'Non conforme':'Conforme';
+  const el=document.getElementById('ar_conf');
+  el.textContent=conf;el.className='fro '+(conf==='Non conforme'?'nc':'ok');
+  document.getElementById('ar_ch').value=conf;
+  document.getElementById('ar_ncw').style.display=conf==='Non conforme'?'':'none';
+}
+
+function arCalcHuiles(){
+  const c=document.getElementById('ar_chim')?.value||'';
+  const v=document.getElementById('ar_vis')?.value||'';
+  const conf=(c==='Non conforme'||v==='Non conforme')?'Non conforme':(c&&v&&c!==''&&v!==''?'Conforme':'');
+  const el=document.getElementById('ar_conf');
+  if(el){el.textContent=conf||'—';el.className='fro '+(conf==='Non conforme'?'nc':conf==='Conforme'?'ok':'');}
+  const h=document.getElementById('ar_ch');if(h)h.value=conf;
+  const w=document.getElementById('ar_ncw');if(w)w.style.display=conf==='Non conforme'?'':'none';
+}
+
+async function subAddReleve(type, nom) {
+  const conf = document.getElementById('ar_ch')?.value;
+  if(!conf){toast('T°C obligatoire','error');return;}
+  if(conf==='Non conforme'){
+    if(!document.querySelector('#mb [name="Action"]')?.value?.trim()){toast('Action corrective obligatoire','error');return;}
+    if(!document.getElementById('ar_rgl')?.value){toast('Statut obligatoire','error');return;}
+  }
+  const d = collect();
+  d['Appareil'] = nom;
+  const r = await POST({action:'add', module:type, data:d});
+  if(!r) return;
+  toast('Relevé ajouté ✅','success');
+  await POST({action:'updateAppareilVerif', type, nom, date:d['Date']||today()});
+  await loadModule_appareils(type);
+  openAppareilModal(type, nom);
+  sendLog('add', type, r.id, d['Conformité'], '');
+}
+function openAddAppareilModal(type) {
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  document.getElementById('mt').textContent = '＋ Nouvel appareil — '+(type==='froid'?'Contrôle Froid':'Huiles');
+  document.getElementById('mb').innerHTML = `<div class="fg">
+    <div class="field full"><label>Nom de l'appareil *</label><input type="text" name="nom" placeholder="Ex: Frigo 1, Congélateur Cave…"/></div>
+    ${type==='froid'?`
+    <div class="field full"><label>Type *</label>
+      <select name="typeControle">
+        <option value="Frigo">❄️ Frigo (positif)</option>
+        <option value="Congélateur">🧊 Congélateur (négatif)</option>
+      </select>
+    </div>
+    <div class="field"><label>T°C cible</label><input type="number" step="0.5" name="tempCible" placeholder="Ex: 4"/></div>
+    <div class="field"><label>T°C critique</label><input type="number" step="0.5" name="tempCritique" placeholder="Ex: 8"/></div>`:''}
+    <div class="field"><label>Fréquence *</label>
+      <select name="frequence">
+        <option value="Quotidien" ${type==='froid'?'selected':''}>Quotidien</option>
+        <option value="Hebdomadaire" ${type==='huiles'?'selected':''}>Hebdomadaire</option>
+        <option value="Mensuel">Mensuel</option>
+      </select>
+    </div>
+    <div class="field full"><label>Notes</label><textarea name="notes" placeholder="Remarques, consignes…"></textarea></div>
+  </div>`;
+  document.getElementById('mf').innerHTML = `<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subAddAppareilModal('${type}')">💾 Ajouter</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+
+async function subAddAppareilModal(type) {
+  const nom = document.querySelector('#mb [name="nom"]')?.value?.trim();
+  if(!nom){toast('Nom obligatoire','error');return;}
+  const data = {
+    notes:        document.querySelector('#mb [name="notes"]')?.value?.trim()||'',
+    typeControle: document.querySelector('#mb [name="typeControle"]')?.value||'',
+    tempCible:    document.querySelector('#mb [name="tempCible"]')?.value||'',
+    tempCritique: document.querySelector('#mb [name="tempCritique"]')?.value||'',
+    frequence:    document.querySelector('#mb [name="frequence"]')?.value||''
+  };
+  const r = await POST({action:'addAppareil', type, nom, data});
+  if(!r) return;
+  await loadAppareils(type);
+  toast('Appareil ajouté ✅','success');
+  clom();
+  loadModule_appareils(type);
+}
+async function deleteAppareil(type, nom) {
+  if(!confirm('Supprimer "'+nom+'" et tous ses relevés ?'))return;
+  const r = await POST({action:'deleteAppareil', type, nom});
+  if(!r)return;
+  toast('Supprimé','info');
+  loadModule_appareils(type);
+}
+
+function openEditAppareil(type, nom) {
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  const app = _appareilsData[type].find(a=>a.nom===nom);
+  if(!app)return;
+  document.getElementById('mt').textContent = '✏️ Modifier — '+esc(nom);
+  document.getElementById('mb').innerHTML = `<div class="fg">
+    ${type==='froid'?`
+    <div class="field full"><label>Type</label>
+      <select name="typeControle">
+        <option value="Frigo" ${app.typeControle==='Frigo'?'selected':''}>❄️ Frigo (positif)</option>
+        <option value="Congélateur" ${app.typeControle==='Congélateur'?'selected':''}>🧊 Congélateur (négatif)</option>
+      </select>
+    </div>
+    <div class="field"><label>T°C cible</label><input type="number" step="0.5" name="tempCible" value="${app.tempCible||''}"/></div>
+    <div class="field"><label>T°C critique</label><input type="number" step="0.5" name="tempCritique" value="${app.tempCritique||''}"/></div>`:''}
+    <div class="field"><label>Fréquence</label>
+      <select name="frequence">
+        <option value="Quotidien" ${app.frequence==='Quotidien'?'selected':''}>Quotidien</option>
+        <option value="Hebdomadaire" ${app.frequence==='Hebdomadaire'?'selected':''}>Hebdomadaire</option>
+        <option value="Mensuel" ${app.frequence==='Mensuel'?'selected':''}>Mensuel</option>
+      </select>
+    </div>
+    <div class="field full"><label>Notes</label><textarea name="notes">${esc(app.notes||'')}</textarea></div>
+  </div>`;
+  document.getElementById('mf').innerHTML = `<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subEditAppareil('${esc(type)}','${esc(nom)}')">💾 Enregistrer</button>`;
+  document.getElementById('mov').classList.add('open');
+}
+
+async function subEditAppareil(type, nom) {
+  const data = {
+    notes:        document.querySelector('#mb [name="notes"]')?.value?.trim()||'',
+    typeControle: document.querySelector('#mb [name="typeControle"]')?.value||'',
+    tempCible:    document.querySelector('#mb [name="tempCible"]')?.value||'',
+    tempCritique: document.querySelector('#mb [name="tempCritique"]')?.value||'',
+    frequence:    document.querySelector('#mb [name="frequence"]')?.value||''
+  };
+  const r = await POST({action:'updateAppareil', type, nom, data});
+  if(!r)return;
+  toast('Mis à jour ✅','success');
+  clom();
+  loadModule_appareils(type);
 }
 </script>
 </body>
