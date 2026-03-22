@@ -295,14 +295,14 @@ tbody tr:hover{background:var(--sf2)}
 @media(max-width:768px){
   /* Sidebar cachée par défaut sur mobile */
   aside{
-    position:fixed;left:-240px;top:0;height:100vh;z-index:100;
+    position:fixed;left:-240px;top:0;height:100vh;z-index:200;
     transition:left .25s ease;
   }
   aside.open{left:0;box-shadow:4px 0 40px rgba(0,0,0,.4)}
   
   /* Overlay quand sidebar ouverte */
-  .sidebar-overlay{
-    display:none;position:fixed;inset:0;z-index:99;
+ .sidebar-overlay{
+    display:none;position:fixed;inset:0;z-index:199;
     background:rgba(0,0,0,.4);backdrop-filter:blur(2px);
   }
   .sidebar-overlay.on{display:block}
