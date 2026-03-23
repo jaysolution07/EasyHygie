@@ -1727,7 +1727,7 @@ function renderNettoyage(plan){
     ${isAdmin()?`<button class="btn bp sm" onclick="openAddElement('${esc(zone)}')">＋ Élément</button>`:''}
   </div>
 </div>
-    <div class="card-b" style="padding:0"><table style="width:100%;border-collapse:collapse;font-size:12.5px">
+    <div class="card-b" style="padding:0"><div style="overflow-x:auto;-webkit-overflow-scrolling:touch;"><table style="min-width:600px;border-collapse:collapse;font-size:12.5px">
       <thead><tr>
         <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Tâche</th>
         <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Produit</th>
@@ -1758,7 +1758,7 @@ return`<tr style="border-bottom:1px solid var(--bd2)">
   </div></td>
 </tr>`;
       }).join('')}</tbody>
-    </table></div>
+    </table></div></div>
   </div>`).join('');
 }
 
@@ -1981,7 +1981,8 @@ function renderAppareilsList(type, appareils) {
   const icon = type==='froid'?'❄️':'🛢';
   container.innerHTML = `<div class="card">
     <div class="card-b" style="padding:0">
-      <table style="width:100%;border-collapse:collapse;font-size:12.5px">
+      <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+      <table style="min-width:600px;border-collapse:collapse;font-size:12.5px">
         <thead><tr>
           <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Appareil</th>
           <th style="padding:11px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Fréquence</th>
@@ -2019,6 +2020,7 @@ const prochaine = app.prochaineVerif ? String(app.prochaineVerif).slice(0,10).sp
           }).join('')}
         </tbody>
       </table>
+      </div>
     </div>
   </div>`;
 }
