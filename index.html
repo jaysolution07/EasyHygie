@@ -1324,8 +1324,11 @@ async function subRes(mod,id){const act=document.getElementById('res-act')?.valu
 /* ── TOAST ── */
 function toast(msg,t='info'){const icons={success:'✅',error:'❌',info:'ℹ️'};const el=document.createElement('div');el.className='toast '+t;el.innerHTML=`<span>${icons[t]}</span><span>${msg}</span>`;document.getElementById('tc').appendChild(el);setTimeout(()=>el.remove(),3800);}
 function toggleSidebar(){
-  document.querySelector('aside').classList.toggle('open');
-  document.getElementById('sidebar-overlay').classList.toggle('on');
+  const aside = document.querySelector('aside');
+  const overlay = document.getElementById('sidebar-overlay');
+  aside.classList.toggle('open');
+  overlay.classList.toggle('on');
+  overlay.style.left = aside.classList.contains('open') ? '240px' : '0';
 }
 // Fermer sidebar quand on clique sur un item
 document.querySelectorAll('.ni').forEach(ni=>{
