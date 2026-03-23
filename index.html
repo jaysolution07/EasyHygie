@@ -577,6 +577,7 @@ tbody tr:hover{background:var(--sf2)}
           <div class="tb-bar">
             <input type="text" placeholder="Rechercher zone, tâche…" oninput="filterNettoyage(this.value)"/>
             <button class="btn bp" id="btn-add-zone" onclick="openAddZone()" style="display:none">＋ Nouvelle zone</button>
+<button class="btn bg" id="btn-produits" onclick="openProduitsModal()" style="display:none">🧴 Produits</button>
             <button class="btn bg" onclick="loadModule('nettoyage')">↻</button>
           </div>
           <div id="nettoyage-zones"></div>
@@ -718,8 +719,11 @@ function showApp(){
   document.querySelectorAll('.ni-admin-only').forEach(el=>el.classList.toggle('visible',isAdmin()));
 const btnVider=document.getElementById('btn-vider-logs');
 if(btnVider)btnVider.style.display=isAdmin()?'':'none';
+const btnProduits=document.getElementById('btn-produits');
+if(btnProduits)btnProduits.style.display=isAdmin()?'':'none';
   initBubbles();
   loadAllAppareils().then(()=>loadDashboard());
+_preloadAll();
   if(!sessionStorage.getItem('easyhy_logged')){
     sessionStorage.setItem('easyhy_logged','1');
     logLogin();
@@ -888,6 +892,33 @@ function refreshCurrent(){if(S.panel==='dashboard')loadDashboard();else if(S.pan
 /* ── APPAREILS ── */
 async function loadAppareils(t){const r=await GET({action:'getAppareils',type:t});if(r)S.appareils[t]=r.map(a=>a.nom);}
 async function loadAllAppareils(){await Promise.all([loadAppareils('froid'),loadAppareils('huiles')]);}
+async function _preloadAll(){
+  const [rf,cg,rm,bls,froid,huiles,plan,produits]=await Promise.all([
+    GET({action:'getAll',module:'refroidissement'}),
+    GET({action:'getAll',module:'congelation'}),
+    GET({action:'getAll',module:'remise'}),
+    GET({action:'getBLGrouped'}),
+    GET({action:'getAll',module:'froid'}),
+    GET({action:'getAll',module:'huiles'}),
+    GET({action:'getNettoyagePlan'}),
+    GET({action:'getProduits'})
+  ]);
+  if(rf)S.data.refroidissement=rf;
+  if(cg)S.data.congelation=cg;
+  if(rm)S.data.remise=rm;
+  if(bls)_blData=bls;
+  if(froid)S.data.froid=froid;
+  if(huiles)S.data.huiles=huiles;
+  if(plan)_nettoyageData=plan;
+  if(produits)_produitsData=produits;
+  const [appFroid,appHuiles]=await Promise.all([
+    GET({action:'getAppareils',type:'froid'}),
+    GET({action:'getAppareils',type:'huiles'})
+  ]);
+  if(appFroid){_appareilsData.froid=appFroid;S.appareils.froid=appFroid.map(a=>a.nom);}
+  if(appHuiles){_appareilsData.huiles=appHuiles;S.appareils.huiles=appHuiles.map(a=>a.nom);}
+  setTimeout(_preloadAll, 120000);
+}
 
 /* ── THERMO ── */
 function updateThermoWidget(){
@@ -906,8 +937,20 @@ function updateThermoWidget(){
 /* ── DASHBOARD ── */
 async function loadDashboard(){
   document.getElementById('kgrid').innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
-  const dash=await GET({action:'getDashboard'});if(!dash)return;
-  let tnc=0,tnr=0,tok=0;Object.values(dash).forEach(m=>{tnc+=m.nonConforme;tnr+=m.nonRegle;tok+=m.conforme;});
+  
+  const full = await GET({action:'getDashboardFull'});
+  if(!full) return;
+  
+  const dash = full.dashboard;
+  const blGrouped = full.blGrouped;
+  const ncOuvertes = full.ncOuvertes;
+  const froidData = full.froidData;
+  const appareils = full.appareils;
+  const nettoyagePlan = full.nettoyagePlan;
+
+  // KPI
+  let tnc=0,tnr=0,tok=0;
+  Object.values(dash).forEach(m=>{tnc+=m.nonConforme;tnr+=m.nonRegle;tok+=m.conforme;});
   const tot=tok+tnc,pct=tot>0?Math.round(tok/tot*100):100;
   document.getElementById('kgrid').innerHTML=`
     <div class="kc ${tnr>0?'kd':''}" style="--cc:#e53e3e;--cc2:#fc8181"><div class="kn">NC non-réglées</div><div class="kv">${tnr}</div><div class="ks">ouvertes</div></div>
@@ -915,12 +958,62 @@ async function loadDashboard(){
     <div class="kc" style="--cc:#0fa968;--cc2:#34d399"><div class="kn">Conformes</div><div class="kv">${tok}</div><div class="ks">enregistrements</div></div>
     <div class="kc" style="--cc:#2563eb;--cc2:#60a5fa"><div class="kn">Taux global</div><div class="kv">${pct}%</div><div class="ks">de conformité</div></div>
     ${Object.entries(dash).map(([k,m])=>{const mt=MM[k];return`<div class="kc" style="--cc:${mt.col};--cc2:${mt.col2}" onclick="showPanel('${k}',document.querySelector('[data-p=${k}]'))"><div class="kn">${mt.icon} ${mt.label}</div><div class="kv">${m.total}</div><div class="ks">${m.nonConforme} NC · ${m.nonRegle} ouvert${m.nonRegle>1?'s':''}</div></div>`;}).join('')}`;
+
+  // Barres conformité
   document.getElementById('mod-bars').innerHTML=Object.entries(dash).map(([k,m])=>{
     const mt=MM[k];const pp=m.total>0?Math.round(m.conforme/m.total*100):100;const c=pp>80?'#0fa968':pp>50?'#d97706':'#e53e3e';
     return`<div style="margin-bottom:13px"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px"><span style="font-weight:600">${mt.icon} ${mt.label}</span><span style="color:var(--mu)">${m.conforme}/${m.total}</span></div><div style="height:7px;background:var(--sf3);border-radius:4px;overflow:hidden;border:1px solid var(--bd)"><div style="height:100%;width:${pp}%;background:${c};border-radius:4px;transition:width .6s ease"></div></div></div>`;
   }).join('');
+
+  // Badges sidebar
   Object.entries(dash).forEach(([k,m])=>{const b=document.getElementById('b-'+k);if(b){b.textContent=m.nonRegle;b.classList.toggle('on',m.nonRegle>0);}});
-  renderNCOpen();await loadFroidChart();updateThermoWidget();updateNettoyageBadge();renderNettoyageDashboard();renderAppareilsDashboard();
+
+  // NC ouvertes
+  const ncList = document.getElementById('nc-list');
+  const all = [];
+  if(blGrouped) blGrouped.filter(bl=>bl.conformite==='Non conforme'&&bl.nonRegle).forEach(bl=>all.push({ID_NC:bl.ID_BL,Date:bl.Date,_m:'reception'}));
+  Object.entries(ncOuvertes).forEach(([k,rows])=>rows.forEach(r=>all.push({...r,_m:k})));
+  if(!all.length){ncList.innerHTML='<div class="empty"><div class="ei">✅</div><p>Aucune NC ouverte</p></div>';}
+  else{ncList.innerHTML=all.slice(0,12).map(r=>{const mt=MM[r._m];return`<div class="nc-row"><span style="font-size:18px">${mt.icon}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px">${r['ID_NC']||'?'}</div><div style="font-size:11px;color:var(--mu)">${mt.label} · ${r['Date']||''}</div></div><span class="badge bnc">Non-réglé</span><button class="btn bg sm" onclick="showPanel('${r._m}',document.querySelector('[data-p=${r._m}]'))">→</button></div>`;}).join('');}
+
+  // Graphique froid
+  S.data.froid = froidData;
+  const apps=[...new Set(froidData.map(r=>r['Appareil']).filter(Boolean))];
+  const sel=document.getElementById('chart-sel');
+  sel.innerHTML='<option value="">Tous les appareils</option>'+apps.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  renderFroidChart();
+
+  // Thermo widget
+  updateThermoWidget();
+
+  // Appareils dashboard
+  const tous=[...(appareils.froid||[]),...(appareils.huiles||[])];
+  const alertesApp=tous.filter(a=>_appareilStatut(a)==='retard');
+  const elApp=document.getElementById('appareils-dashboard');
+  if(elApp){
+    if(!alertesApp.length){elApp.innerHTML='<div class="empty"><div class="ei">✅</div><p>Tous les appareils sont à jour</p></div>';}
+    else{elApp.innerHTML=alertesApp.map(a=>{
+      const derniere=a.derniereVerif?String(a.derniereVerif).slice(0,10).split('-').reverse().join('/'):'—';
+      const badge='<span class="badge bnc">⚠️ En retard</span>';
+      return`<div class="nc-row"><span style="font-size:18px">${a.type==='froid'?'❄️':'🛢'}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px">${esc(a.nom)}</div><div style="font-size:11px;color:var(--mu)">${a.type==='froid'?'Contrôle Froid':'Huiles'} · ${esc(a.frequence)} · dernier: ${derniere}</div></div>${badge}<button class="btn bg sm" onclick="showPanel('${a.type}',document.querySelector('[data-p=${a.type}]'))">→</button></div>`;
+    }).join('');}
+  }
+
+  // Nettoyage badge + dashboard
+  const enRetard=nettoyagePlan.filter(t=>_nettoyageStatut(t)==='retard').length;
+  const bNet=document.getElementById('b-nettoyage');
+  if(bNet){bNet.textContent=enRetard;bNet.classList.toggle('on',enRetard>0);}
+  const elNet=document.getElementById('nettoyage-dashboard');
+  if(elNet){
+    const alertes=[...nettoyagePlan.filter(t=>_nettoyageStatut(t)==='retard'),...nettoyagePlan.filter(t=>_nettoyageStatut(t)==='urgent')];
+    if(!nettoyagePlan.length){elNet.innerHTML='<div class="empty"><div class="ei">🧹</div><p>Aucune tâche configurée</p></div>';}
+    else if(!alertes.length){elNet.innerHTML='<div class="empty"><div class="ei">✅</div><p>Toutes les tâches sont à jour</p></div>';}
+    else{elNet.innerHTML=alertes.map(t=>{
+      const st=_nettoyageStatut(t);
+      const dateAff=t['Prochaine échéance']?t['Prochaine échéance'].split('-').reverse().join('/'):'—';
+      return`<div class="nc-row"><span style="font-size:18px">${st==='retard'?'🔴':'🟠'}</span><div style="flex:1;min-width:0"><div style="font-weight:600;font-size:12.5px">${esc(t['Tâche']||'')}</div><div style="font-size:11px;color:var(--mu)">${esc(t['Zone']||'')} · ${esc(t['Fréquence']||'')} · échéance ${dateAff}</div></div><span class="badge ${st==='retard'?'bnc':'bw'}">${st==='retard'?'En retard':'Aujourd\'hui'}</span></div>`;
+    }).join('');}
+  }
 }
 async function renderNCOpen(){
   const list=document.getElementById('nc-list');
@@ -1364,6 +1457,11 @@ async function loadModule(m) {
   if (m === 'froid') { await loadModule_appareils('froid'); return; }
   if (m === 'huiles') { await loadModule_appareils('huiles'); return; }
   const tb=document.querySelector(`#table-${m} tbody`);
+  if(S.data[m]&&S.data[m].length){
+    renderTable(m,S.data[m]);
+    GET({action:'getAll',module:m}).then(rows=>{if(rows){S.data[m]=rows;renderTable(m,rows);}});
+    return;
+  }
   tb.innerHTML=`<tr><td colspan="20"><div class="ld"><div class="sp"></div></div></td></tr>`;
   const rows=await GET({action:'getAll',module:m});
   if(!rows)return;S.data[m]=rows;renderTable(m,rows);
@@ -1372,6 +1470,11 @@ async function loadModule(m) {
 // ── Charger les BL ───────────────────────────────────────────
 async function loadBL() {
   const tb = document.querySelector('#table-reception tbody');
+  if(_blData&&_blData.length){
+    renderBLList(_blData);
+    GET({action:'getBLGrouped'}).then(bls=>{if(bls){_blData=bls;renderBLList(bls);}});
+    return;
+  }
   tb.innerHTML = '<tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr>';
   const bls = await GET({action: 'getBLGrouped'});
   if (!bls) return;
@@ -1692,9 +1795,20 @@ async function subResLigne(ligneId) {
 let _nettoyageData=[];
 
 async function loadNettoyage(){
-  document.getElementById('nettoyage-zones').innerHTML='<div class="ld"><div class="sp"></div></div>';
   const btnAdd=document.getElementById('btn-add-zone');
-if(btnAdd)btnAdd.style.display=isAdmin()?'':'none';
+  if(btnAdd)btnAdd.style.display=isAdmin()?'':'none';
+  const btnProd=document.getElementById('btn-produits');
+  if(btnProd)btnProd.style.display=isAdmin()?'':'none';
+  if(_produitsData.length===0)await loadProduits();
+  if(_nettoyageData&&_nettoyageData.length){
+    renderNettoyage(_nettoyageData);
+    const enRetard=_nettoyageData.filter(t=>_nettoyageStatut(t)==='retard').length;
+    const b=document.getElementById('b-nettoyage');
+    if(b){b.textContent=enRetard;b.classList.toggle('on',enRetard>0);}
+    GET({action:'getNettoyagePlan'}).then(plan=>{if(plan){_nettoyageData=plan;renderNettoyage(plan);}});
+    return;
+  }
+  document.getElementById('nettoyage-zones').innerHTML='<div class="ld"><div class="sp"></div></div>';
   const plan=await GET({action:'getNettoyagePlan'});
   if(!plan)return;
   _nettoyageData=plan;
@@ -1703,7 +1817,6 @@ if(btnAdd)btnAdd.style.display=isAdmin()?'':'none';
   const b=document.getElementById('b-nettoyage');
   if(b){b.textContent=enRetard;b.classList.toggle('on',enRetard>0);}
 }
-
 function _nettoyageStatut(t){
   if(!t['Prochaine échéance'])return'ok';
   const today=new Date();today.setHours(0,0,0,0);
@@ -1773,7 +1886,7 @@ function openAddZone(){
   document.getElementById('mb').innerHTML=`<div class="fg">
     <div class="field full"><label>Nom de la zone *</label><input type="text" name="Zone" placeholder="Ex: Cuisine, Salle, WC…"/></div>
     <div class="field full"><label>Premier élément à nettoyer *</label><input type="text" name="Tâche" placeholder="Ex: Sol, Plan de travail, Friteuse…"/></div>
-    <div class="field"><label>Produit</label><input type="text" name="Produit" placeholder="Ex: Eau de javel…"/></div>
+    <div class="field"><label>Produit</label>${_produitsSelect()}</div>
     <div class="field"><label>Fréquence *</label><select name="Fréquence"><option value="">—</option><option value="Quotidien">Quotidien</option><option value="Hebdomadaire">Hebdomadaire</option><option value="Mensuel">Mensuel</option></select></div>
   </div>`;
   document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subAddZone()">💾 Créer</button>`;
@@ -1796,7 +1909,7 @@ function openAddElement(zone){
   document.getElementById('mt').textContent='＋ Ajouter un élément — '+esc(zone);
   document.getElementById('mb').innerHTML=`<div class="fg">
     <div class="field full"><label>Élément à nettoyer *</label><input type="text" name="Tâche" placeholder="Ex: Sol, Plan de travail…"/></div>
-    <div class="field"><label>Produit</label><input type="text" name="Produit" placeholder="Ex: Eau de javel…"/></div>
+    <div class="field"><label>Produit</label>${_produitsSelect('Produit', '')}</div>
     <div class="field"><label>Fréquence *</label><select name="Fréquence"><option value="">—</option><option value="Quotidien">Quotidien</option><option value="Hebdomadaire">Hebdomadaire</option><option value="Mensuel">Mensuel</option></select></div>
     <input type="hidden" name="Zone" value="${esc(zone)}"/>
   </div>`;
@@ -1820,7 +1933,7 @@ function openEditTache(id){
   document.getElementById('mt').textContent='✏️ Modifier — '+esc(t['Tâche']);
   document.getElementById('mb').innerHTML=`<div class="fg">
     <div class="field full"><label>Élément *</label><input type="text" name="Tâche" value="${esc(t['Tâche']||'')}"/></div>
-    <div class="field"><label>Produit</label><input type="text" name="Produit" value="${esc(t['Produit']||'')}"/></div>
+    <div class="field"><label>Produit</label>${_produitsSelect('Produit', t['Produit']||'')}</div>
     <div class="field"><label>Fréquence *</label><select name="Fréquence">
       <option value="Quotidien" ${t['Fréquence']==='Quotidien'?'selected':''}>Quotidien</option>
       <option value="Hebdomadaire" ${t['Fréquence']==='Hebdomadaire'?'selected':''}>Hebdomadaire</option>
@@ -1854,13 +1967,18 @@ function openEffectuerTache(id){
   document.getElementById('mt').textContent='✅ Effectuer — '+esc(t['Tâche']);
   document.getElementById('mb').innerHTML=`<div class="fg">
     <div class="field full"><label>Exécuté par</label><input type="text" name="executePar" value="${esc(_sess?.nom||'')}"/></div>
-    <div class="field full"><label>Produit utilisé</label><input type="text" name="produitUtilise" value="${esc(t['Produit']||'')}"/></div>
+    <div class="field full"><label>Produit utilisé</label>${_produitsSelect('produitUtilise', t['Produit']||'')}</div>
     <div class="field full"><label>Observations</label><textarea name="observations" placeholder="Optionnel…"></textarea></div>
   </div>`;
   document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="subEffectuerTache('${esc(id)}')">✅ Confirmer</button>`;
   document.getElementById('mov').classList.add('open');
 }
-
+function _produitsSelect(name='Produit', selected='') {
+  const opts = _produitsData.map(p=>
+    `<option value="${esc(p.Nom)}" ${p.Nom===selected?'selected':''}>${esc(p.Nom)}</option>`
+  ).join('');
+  return `<select name="${name}"><option value="">— Choisir —</option>${opts}</select>`;
+}
 async function subEffectuerTache(id){
   const data={};
   document.querySelectorAll('#mb [name]').forEach(el=>{data[el.getAttribute('name')]=el.value.trim();});
@@ -1921,6 +2039,113 @@ async function renderNettoyageDashboard(){
     </div>`;
   }).join('');
 }
+/* ── PRODUITS ENTRETIEN ── */
+let _produitsData = [];
+
+async function loadProduits() {
+  const r = await GET({action:'getProduits'});
+  if(r) _produitsData = r;
+}
+
+function openProduitsModal() {
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  document.getElementById('mt').textContent = '🧴 Produits d\'entretien';
+  renderProduitsModal();
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="clom()">Fermer</button>
+    <button class="btn bp" onclick="openAddProduit()">＋ Ajouter</button>
+  `;
+  document.getElementById('mov').classList.add('open');
+}
+
+function renderProduitsModal() {
+  if(!_produitsData.length) {
+    document.getElementById('mb').innerHTML = '<div class="empty"><div class="ei">🧴</div><p>Aucun produit enregistré</p></div>';
+    return;
+  }
+  document.getElementById('mb').innerHTML = `
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+    <table style="width:100%;min-width:400px;border-collapse:collapse;font-size:12.5px">
+      <thead><tr>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Nom</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Fabricant</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)">Référence</th>
+        <th style="padding:10px 14px;background:var(--sf3);color:var(--mu);font-size:10.5px;text-transform:uppercase;letter-spacing:1px;font-weight:700;border-bottom:1.5px solid var(--bd)"></th>
+      </tr></thead>
+      <tbody>
+        ${_produitsData.map(p=>`<tr style="border-bottom:1px solid var(--bd2)">
+          <td style="padding:10px 14px;font-weight:600">${esc(p.Nom)}</td>
+          <td style="padding:10px 14px;color:var(--mu)">${esc(p.Fabricant||'—')}</td>
+          <td style="padding:10px 14px;color:var(--mu)">${esc(p.Référence||'—')}</td>
+          <td style="padding:10px 14px"><div style="display:flex;gap:4px">
+            <button class="btn bg sm" onclick="openEditProduit('${esc(p.ID_Produit)}')">✏️</button>
+            <button class="btn bd2 sm" onclick="deleteProduit('${esc(p.ID_Produit)}')">🗑</button>
+          </div></td>
+        </tr>`).join('')}
+      </tbody>
+    </table></div>`;
+}
+
+function openAddProduit() {
+  document.getElementById('mt').textContent = '＋ Nouveau produit';
+  document.getElementById('mb').innerHTML = `<div class="fg">
+    <div class="field full"><label>Nom *</label><input type="text" name="Nom" placeholder="Ex: Eau de Javel, Dégraissant…"/></div>
+    <div class="field"><label>Fabricant</label><input type="text" name="Fabricant" placeholder="Ex: Ecolab…"/></div>
+    <div class="field"><label>Référence</label><input type="text" name="Référence" placeholder="Ex: REF-001…"/></div>
+    <div class="field full"><label>Notes</label><textarea name="Notes" placeholder="Dilution, précautions…"></textarea></div>
+  </div>`;
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="openProduitsModal()">← Retour</button>
+    <button class="btn bp" onclick="subAddProduit()">💾 Enregistrer</button>
+  `;
+}
+
+async function subAddProduit() {
+  const data = {};
+  document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value)data[el.getAttribute('name')]=el.value.trim();});
+  if(!data.Nom){toast('Nom obligatoire','error');return;}
+  const r = await POST({action:'addProduit', data});
+  if(!r) return;
+  await loadProduits();
+  toast('Produit ajouté ✅','success');
+  openProduitsModal();
+}
+
+function openEditProduit(id) {
+  const p = _produitsData.find(p=>p.ID_Produit===id);
+  if(!p) return;
+  document.getElementById('mt').textContent = '✏️ Modifier — '+esc(p.Nom);
+  document.getElementById('mb').innerHTML = `<div class="fg">
+    <div class="field full"><label>Nom *</label><input type="text" name="Nom" value="${esc(p.Nom)}"/></div>
+    <div class="field"><label>Fabricant</label><input type="text" name="Fabricant" value="${esc(p.Fabricant||'')}"/></div>
+    <div class="field"><label>Référence</label><input type="text" name="Référence" value="${esc(p.Référence||'')}"/></div>
+    <div class="field full"><label>Notes</label><textarea name="Notes">${esc(p.Notes||'')}</textarea></div>
+  </div>`;
+  document.getElementById('mf').innerHTML = `
+    <button class="btn bg" onclick="openProduitsModal()">← Retour</button>
+    <button class="btn bp" onclick="subEditProduit('${esc(id)}')">💾 Enregistrer</button>
+  `;
+}
+
+async function subEditProduit(id) {
+  const data = {};
+  document.querySelectorAll('#mb [name]').forEach(el=>{data[el.getAttribute('name')]=el.value.trim();});
+  if(!data.Nom){toast('Nom obligatoire','error');return;}
+  const r = await POST({action:'updateProduit', id, data});
+  if(!r) return;
+  await loadProduits();
+  toast('Mis à jour ✅','success');
+  openProduitsModal();
+}
+
+async function deleteProduit(id) {
+  if(!confirm('Supprimer ce produit ?')) return;
+  const r = await POST({action:'deleteProduit', id});
+  if(!r) return;
+  await loadProduits();
+  toast('Supprimé','info');
+  openProduitsModal();
+}
 async function renderAppareilsDashboard(){
   const el=document.getElementById('appareils-dashboard');
   if(!el)return;
@@ -1953,15 +2178,21 @@ let _appareilsData = {froid:[], huiles:[]};
 
 async function loadModule_appareils(type) {
   const container = document.getElementById(type+'-appareils-list');
-  container.innerHTML = '<div class="ld"><div class="sp"></div></div>';
   const btnAdd = document.getElementById('btn-add-app-'+type);
   if(btnAdd) btnAdd.style.display = isAdmin() ? '' : 'none';
+  if(_appareilsData[type]&&_appareilsData[type].length){
+    renderAppareilsList(type, _appareilsData[type]);
+    GET({action:'getAppareils',type}).then(appareils=>{
+      if(appareils){_appareilsData[type]=appareils;renderAppareilsList(type,appareils);}
+    });
+    return;
+  }
+  container.innerHTML = '<div class="ld"><div class="sp"></div></div>';
   const appareils = await GET({action:'getAppareils', type});
   if(!appareils) return;
   _appareilsData[type] = appareils;
   renderAppareilsList(type, appareils);
 }
-
 function _appareilStatut(app) {
   if(!app.prochaineVerif) return 'jamais';
   const today = new Date(); today.setHours(0,0,0,0);
