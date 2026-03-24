@@ -532,7 +532,7 @@ tbody tr:hover{background:var(--sf2)}
     <div class="tb-bar">
       <input type="text" placeholder="Rechercher BL, fournisseur…" oninput="filterBL(this.value)"/>
       <button class="btn bp" onclick="openAddBL()">＋ Nouveau BL</button>
-      <button class="btn bg" onclick="loadModule('reception')">↻</button>
+      <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
     </div>
     <div class="twrap">
       <table id="table-reception">
@@ -557,28 +557,28 @@ tbody tr:hover{background:var(--sf2)}
 </div>
         <div class="panel" id="panel-froid">
   <div class="tb-bar">
-    <button class="btn bg" onclick="loadModule('froid')">↻ Actualiser</button>
+    <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
     <button class="btn bp" id="btn-add-app-froid" onclick="openAddAppareilModal('froid')" style="display:none">＋ Appareil</button>
   </div>
   <div id="froid-appareils-list"><div class="ld"><div class="sp"></div></div></div>
 </div>
         <div class="panel" id="panel-huiles">
   <div class="tb-bar">
-    <button class="btn bg" onclick="loadModule('huiles')">↻ Actualiser</button>
+    <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
     <button class="btn bp" id="btn-add-app-huiles" onclick="openAddAppareilModal('huiles')" style="display:none">＋ Appareil</button>
   </div>
   <div id="huiles-appareils-list"><div class="ld"><div class="sp"></div></div></div>
 </div>
-        <div class="panel" id="panel-refroidissement"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('refroidissement',this.value)"/><button class="btn bp" onclick="openAdd('refroidissement')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('refroidissement')">↻</button></div><div class="rh">🔹 Règle : <strong>+63°C → +10°C en ≤ 2h</strong></div><div class="twrap"><table id="table-refroidissement"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-        <div class="panel" id="panel-congelation"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('congelation',this.value)"/><button class="btn bp" onclick="openAdd('congelation')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('congelation')">↻</button></div><div class="rh">🔹 Règle : <strong>+10°C → -18°C à cœur, idéalement &lt;4h</strong></div><div class="twrap"><table id="table-congelation"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-        <div class="panel" id="panel-remise"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('remise',this.value)"/><button class="btn bp" onclick="openAdd('remise')">＋ Ajouter</button><button class="btn bg" onclick="loadModule('remise')">↻</button></div><div class="rh">🔹 Règle : <strong>+3°C → ≥+63°C en ≤ 1h</strong> · Ne jamais réchauffer plusieurs fois</div><div class="twrap"><table id="table-remise"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-refroidissement"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('refroidissement',this.value)"/><button class="btn bp" onclick="openAdd('refroidissement')">＋ Ajouter</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+63°C → +10°C en ≤ 2h</strong></div><div class="twrap"><table id="table-refroidissement"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-congelation"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('congelation',this.value)"/><button class="btn bp" onclick="openAdd('congelation')">＋ Ajouter</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+10°C → -18°C à cœur, idéalement &lt;4h</strong></div><div class="twrap"><table id="table-congelation"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-remise"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('remise',this.value)"/><button class="btn bp" onclick="openAdd('remise')">＋ Ajouter</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+3°C → ≥+63°C en ≤ 1h</strong> · Ne jamais réchauffer plusieurs fois</div><div class="twrap"><table id="table-remise"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
 <!-- NETTOYAGE -->
         <div class="panel" id="panel-nettoyage">
           <div class="tb-bar">
             <input type="text" placeholder="Rechercher zone, tâche…" oninput="filterNettoyage(this.value)"/>
             <button class="btn bp" id="btn-add-zone" onclick="openAddZone()" style="display:none">＋ Nouvelle zone</button>
 <button class="btn bg" id="btn-produits" onclick="openProduitsModal()" style="display:none">🧴 Produits</button>
-            <button class="btn bg" onclick="loadModule('nettoyage')">↻</button>
+            <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
           </div>
           <div id="nettoyage-zones"></div>
         </div>
@@ -681,6 +681,21 @@ tbody tr:hover{background:var(--sf2)}
 //  ⚠️  COLLER L'URL DU SCRIPT MASTER ICI
 // ════════════════════════════════════════════
 const MASTER_URL = 'https://script.google.com/macros/s/AKfycby0nIuSF0f5llrc4ncyhBkzBFScMEgEmOVfydaz9LCp31CQd94NrfM937kCWOCfHRdfcw/exec';
+// Cache simple
+const cache = new Map();
+function getCached(key, ttl = 120000) {
+  const item = cache.get(key);
+  if (item && Date.now() - item.timestamp < ttl) return item.data;
+  return null;
+}
+function setCached(key, data) {
+  cache.set(key, { data, timestamp: Date.now() });
+}
+function invalidateCache(pattern) {
+  for (let key of cache.keys()) {
+    if (key.includes(pattern)) cache.delete(key);
+  }
+}
 // ════════════════════════════════════════════
 
 /* ── SESSION ── */
@@ -827,11 +842,22 @@ const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>
 const tsNow=()=>new Date().toISOString().replace('T',' ').slice(0,19);
 
 /* ── API HACCP ── */
-async function GET(p){
+async function GET(params, forceRefresh = false) {
   if(!API_URL){toast('Non connecté','error');return null;}
-  try{const u=new URL(API_URL);Object.entries(p).forEach(([k,v])=>u.searchParams.set(k,v));
-    const r=await fetch(u,{redirect:'follow'});const j=await r.json();if(!j.ok)throw new Error(j.error);return j.data;}
-  catch(e){toast('API: '+e.message,'error');return null;}
+  const cacheKey = `GET_${JSON.stringify(params)}`;
+  if (!forceRefresh) {
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
+  }
+  try{
+    const u=new URL(API_URL);
+    Object.entries(params).forEach(([k,v])=>u.searchParams.set(k,v));
+    const r=await fetch(u,{redirect:'follow'});
+    const j=await r.json();
+    if(!j.ok)throw new Error(j.error);
+    setCached(cacheKey, j.data);
+    return j.data;
+  }catch(e){toast('API: '+e.message,'error');return null;}
 }
 async function POST(b){
   if(!API_URL){toast('Non connecté','error');return null;}
@@ -842,6 +868,15 @@ async function POST(b){
     const r=await fetch(u,{redirect:'follow'});
     const j=await r.json();
     if(!j.ok)throw new Error(j.error);
+    // Invalider les caches concernés
+    if(b.module) invalidateCache(`"action":"getAll","module":"${b.module}"`);
+    if(b.action === 'addBL' || b.action === 'deleteBL') invalidateCache('"action":"getBLGrouped"');
+    if(b.action === 'addAppareil' || b.action === 'deleteAppareil') invalidateCache('"action":"getAppareils"');
+    if(b.action === 'addTache' || b.action === 'updateTache' || b.action === 'deleteTache' || b.action === 'effectuerTache') invalidateCache('"action":"getNettoyagePlan"');
+    if(b.action === 'addProduit' || b.action === 'updateProduit' || b.action === 'deleteProduit') invalidateCache('"action":"getProduits"');
+    if(b.action === 'purgeAll') cache.clear();
+    invalidateCache('"action":"getDashboardFull"');
+    invalidateCache('"action":"getActionLogs"');
     return j.data;
   }catch(e){toast('API: '+e.message,'error');return null;}
 }
@@ -887,7 +922,13 @@ function showPanel(id,el){
     if(MM[id]){_visitedMods.add(MM[id].label);}
   }
 }
-function refreshCurrent(){if(S.panel==='dashboard')loadDashboard();else if(S.panel==='logs')renderLogs();else if(S.panel==='team')loadTeam();else if(S.panel==='loginlogs')loadLoginLogs();else loadModule(S.panel);}
+function refreshCurrent(){
+  if(S.panel==='dashboard') loadDashboard(true);
+  else if(S.panel==='logs') loadAndRenderLogs(true);
+  else if(S.panel==='team') loadTeam(true);
+  else if(S.panel==='loginlogs') loadLoginLogs(true);
+  else loadModule(S.panel, true);
+}
 
 /* ── APPAREILS ── */
 async function loadAppareils(t){const r=await GET({action:'getAppareils',type:t});if(r)S.appareils[t]=r.map(a=>a.nom);}
@@ -935,12 +976,12 @@ function updateThermoWidget(){
 }
 
 /* ── DASHBOARD ── */
-async function loadDashboard(){
+async function loadDashboard(forceRefresh = false) {
   document.getElementById('kgrid').innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
   
-  const full = await GET({action:'getDashboardFull'});
+  const full = await GET({action:'getDashboardFull'}, forceRefresh);
   if(!full) return;
-  
+   
   const dash = full.dashboard;
   const blGrouped = full.blGrouped;
   const ncOuvertes = full.ncOuvertes;
@@ -1417,10 +1458,48 @@ function collect(){const data={};document.querySelectorAll('#mb [name]').forEach
 function validate(mod){if(mod==='huiles')return valH();if(mod==='reception')return valRec();if(mod==='froid')return valFr();if(['refroidissement','congelation','remise'].includes(mod))return valTh(mod);return true;}
 
 /* ── CRUD HACCP ── */
-async function subAdd(mod){if(!validate(mod))return;const d=collect();const r=await POST({action:'add',module:mod,data:d});if(!r)return;toast('Ajouté : '+r.id,'success');clom();loadModule(mod);sendLog('add',mod,r.id,d['Conformité'],'');}
-async function subEdit(mod,id){if(!validate(mod))return;const d=collect();const r=await POST({action:'update',module:mod,id,data:d});if(!r)return;toast('Mis à jour','success');clom();loadModule(mod);sendLog('update',mod,id,d['Conformité'],'');}
-async function delRow(mod,id){if(!confirm('Supprimer '+id+' ?'))return;const r=await POST({action:'delete',module:mod,id});if(!r)return;toast('Supprimé','info');loadModule(mod);sendLog('delete',mod,id,'','');}
-async function subRes(mod,id){const act=document.getElementById('res-act')?.value?.trim();if(!act){toast('Action obligatoire','error');return;}const r=await POST({action:'resolveNC',module:mod,id,data:{action:act}});if(!r)return;toast('NC résolue ✅','success');clom();loadModule(mod);loadDashboard();sendLog('resolveNC',mod,id,'Réglé',act);}
+async function subAdd(mod){
+  if(!validate(mod))return;
+  const d=collect();
+  const r=await POST({action:'add',module:mod,data:d});
+  if(!r)return;
+  toast('Ajouté : '+r.id,'success');
+  clom();
+  loadModule(mod, true);   // recharge le module avec force
+  loadDashboard(true);     // recharge le tableau de bord
+  sendLog('add',mod,r.id,d['Conformité'],'');
+}
+async function subEdit(mod,id){
+  if(!validate(mod))return;
+  const d=collect();
+  const r=await POST({action:'update',module:mod,id,data:d});
+  if(!r)return;
+  toast('Mis à jour','success');
+  clom();
+  loadModule(mod, true);
+  loadDashboard(true);
+  sendLog('update',mod,id,d['Conformité'],'');
+}
+async function delRow(mod,id){
+  if(!confirm('Supprimer '+id+' ?'))return;
+  const r=await POST({action:'delete',module:mod,id});
+  if(!r)return;
+  toast('Supprimé','info');
+  loadModule(mod, true);
+  loadDashboard(true);
+  sendLog('delete',mod,id,'','');
+}
+async function subRes(mod,id){
+  const act=document.getElementById('res-act')?.value?.trim();
+  if(!act){toast('Action obligatoire','error');return;}
+  const r=await POST({action:'resolveNC',module:mod,id,data:{action:act}});
+  if(!r)return;
+  toast('NC résolue ✅','success');
+  clom();
+  loadModule(mod, true);
+  loadDashboard(true);
+  sendLog('resolveNC',mod,id,'Réglé',act);
+}
 
 /* ── TOAST ── */
 function toast(msg,t='info'){const icons={success:'✅',error:'❌',info:'ℹ️'};const el=document.createElement('div');el.className='toast '+t;el.innerHTML=`<span>${icons[t]}</span><span>${msg}</span>`;document.getElementById('tc').appendChild(el);setTimeout(()=>el.remove(),3800);}
@@ -1451,32 +1530,40 @@ window.addEventListener('DOMContentLoaded',()=>{
 let _blData = []; // tous les BL groupés
  
 // ── Surcharge loadModule pour reception ──────────────────────
-async function loadModule(m) {
-  if (m === 'reception') { await loadBL(); return; }
-  if (m === 'nettoyage') { await loadNettoyage(); return; }
-  if (m === 'froid') { await loadModule_appareils('froid'); return; }
-  if (m === 'huiles') { await loadModule_appareils('huiles'); return; }
-  const tb=document.querySelector(`#table-${m} tbody`);
-  if(S.data[m]&&S.data[m].length){
-    renderTable(m,S.data[m]);
-    GET({action:'getAll',module:m}).then(rows=>{if(rows){S.data[m]=rows;renderTable(m,rows);}});
+async function loadModule(m, forceRefresh = false) {
+  if (m === 'reception') { await loadBL(forceRefresh); return; }
+  if (m === 'nettoyage') { await loadNettoyage(forceRefresh); return; }
+  if (m === 'froid') { await loadModule_appareils('froid', forceRefresh); return; }
+  if (m === 'huiles') { await loadModule_appareils('huiles', forceRefresh); return; }
+  const tb = document.querySelector(`#table-${m} tbody`);
+  if (S.data[m] && S.data[m].length && !forceRefresh) {
+    renderTable(m, S.data[m]);
+    // Recharge en arrière‑plan pour mettre à jour le cache silencieusement
+    GET({ action: 'getAll', module: m }).then(rows => {
+      if (rows) { S.data[m] = rows; renderTable(m, rows); }
+    });
     return;
   }
-  tb.innerHTML=`<tr><td colspan="20"><div class="ld"><div class="sp"></div></div></td></tr>`;
-  const rows=await GET({action:'getAll',module:m});
-  if(!rows)return;S.data[m]=rows;renderTable(m,rows);
+  tb.innerHTML = `…<td colspan="20"><div class="ld"><div class="sp"></div></div>…`;
+  const rows = await GET({ action: 'getAll', module: m }, forceRefresh);
+  if (!rows) return;
+  S.data[m] = rows;
+  renderTable(m, rows);
 }
  
 // ── Charger les BL ───────────────────────────────────────────
-async function loadBL() {
+async function loadBL(forceRefresh = false) {
   const tb = document.querySelector('#table-reception tbody');
-  if(_blData&&_blData.length){
+  if (_blData && _blData.length && !forceRefresh) {
     renderBLList(_blData);
-    GET({action:'getBLGrouped'}).then(bls=>{if(bls){_blData=bls;renderBLList(bls);}});
+    // Recharge en arrière‑plan
+    GET({ action: 'getBLGrouped' }).then(bls => {
+      if (bls) { _blData = bls; renderBLList(bls); }
+    });
     return;
   }
   tb.innerHTML = '<tr><td colspan="8"><div class="ld"><div class="sp"></div></div></td></tr>';
-  const bls = await GET({action: 'getBLGrouped'});
+  const bls = await GET({ action: 'getBLGrouped' }, forceRefresh);
   if (!bls) return;
   _blData = bls;
   renderBLList(bls);
@@ -1690,15 +1777,16 @@ function fmLigne(d={}) {
 }
  
 // ── CRUD BL ───────────────────────────────────────────────────
-async function subAddBL() {
-  if (!valRec()) return;
-  const d = collect();
-  const r = await POST({action:'addBL', data:d});
-  if (!r) return;
-  toast('BL créé : '+r.blId, 'success');
+async function subAddBL(){
+  if(!valRec())return;
+  const d=collect();
+  const r=await POST({action:'addBL', data:d});
+  if(!r)return;
+  toast('BL créé : '+r.blId,'success');
   clom();
-  loadModule('reception');
-  sendLog('add', 'reception', r.blId, d['Conformité'], '');
+  loadModule('reception', true);
+  loadDashboard(true);
+  sendLog('add','reception',r.blId,d['Conformité'],'');
 }
  
 function openAddLigne(blId) {
@@ -1710,15 +1798,16 @@ function openAddLigne(blId) {
   `;
 }
  
-async function subAddLigne(blId) {
-  if (!valRec()) return;
-  const d = collect();
-  const r = await POST({action:'addLigne', blId, data:d});
-  if (!r) return;
-  toast('Matière ajoutée', 'success');
-  await loadModule('reception');
+async function subAddLigne(blId){
+  if(!valRec())return;
+  const d=collect();
+  const r=await POST({action:'addLigne', blId, data:d});
+  if(!r)return;
+  toast('Matière ajoutée','success');
+  await loadModule('reception', true);
+  loadDashboard(true);
   openBLDetail(blId);
-  sendLog('add', 'reception', r.ligneId, d['Conformité'], '');
+  sendLog('add','reception',r.ligneId,d['Conformité'],'');
 }
  
 function openEditLigne(blId, ligneId) {
@@ -1734,37 +1823,39 @@ function openEditLigne(blId, ligneId) {
   `;
 }
  
-async function subEditLigne(blId, ligneId) {
-  if (!valRec()) return;
-  const d = collect();
-  const r = await POST({action:'updateLigne', ligneId, data:d});
-  if (!r) return;
-  toast('Mis à jour', 'success');
-  await loadModule('reception');
+async function subEditLigne(blId, ligneId){
+  if(!valRec())return;
+  const d=collect();
+  const r=await POST({action:'updateLigne', ligneId, data:d});
+  if(!r)return;
+  toast('Mis à jour','success');
+  await loadModule('reception', true);
+  loadDashboard(true);
   openBLDetail(blId);
-  sendLog('update', 'reception', ligneId, d['Conformité'], '');
+  sendLog('update','reception',ligneId,d['Conformité'],'');
 }
  
-async function deleteLigne(ligneId, blId) {
-  if (!confirm('Supprimer cette matière ?')) return;
-  const r = await POST({action:'deleteLigne', ligneId});
-  if (!r) return;
-  toast('Supprimé', 'info');
-  await loadModule('reception');
-  // Vérifier si le BL existe encore
-  const bl = _blData.find(b => b.ID_BL === blId);
-  if (bl && bl.lignes.length > 1) openBLDetail(blId);
+async function deleteLigne(ligneId, blId){
+  if(!confirm('Supprimer cette matière ?'))return;
+  const r=await POST({action:'deleteLigne', ligneId});
+  if(!r)return;
+  toast('Supprimé','info');
+  await loadModule('reception', true);
+  loadDashboard(true);
+  const bl=_blData.find(b=>b.ID_BL===blId);
+  if(bl && bl.lignes.length>1) openBLDetail(blId);
   else clom();
-  sendLog('delete', 'reception', ligneId, '', '');
+  sendLog('delete','reception',ligneId,'','');
 }
  
-async function deleteBL(blId) {
-  if (!confirm('Supprimer le BL '+blId+' et toutes ses matières ?')) return;
-  const r = await POST({action:'deleteBL', blId});
-  if (!r) return;
-  toast('BL supprimé', 'info');
-  loadModule('reception');
-  sendLog('delete', 'reception', blId, '', '');
+async function deleteBL(blId){
+  if(!confirm('Supprimer le BL '+blId+' et toutes ses matières ?'))return;
+  const r=await POST({action:'deleteBL', blId});
+  if(!r)return;
+  toast('BL supprimé','info');
+  loadModule('reception', true);
+  loadDashboard(true);
+  sendLog('delete','reception',blId,'','');
 }
  
 function openResLigne(ligneId) {
@@ -1780,51 +1871,56 @@ function openResLigne(ligneId) {
   `;
 }
  
-async function subResLigne(ligneId) {
-  const act = document.getElementById('res-act')?.value?.trim();
-  if (!act) { toast('Action obligatoire', 'error'); return; }
-  const r = await POST({action:'resolveLigneNC', ligneId, data:{action:act}});
-  if (!r) return;
-  toast('NC résolue ✅', 'success');
+async function subResLigne(ligneId){
+  const act=document.getElementById('res-act')?.value?.trim();
+  if(!act){toast('Action obligatoire','error');return;}
+  const r=await POST({action:'resolveLigneNC', ligneId, data:{action:act}});
+  if(!r)return;
+  toast('NC résolue ✅','success');
   clom();
-  loadModule('reception');
-  loadDashboard();
-  sendLog('resolveNC', 'reception', ligneId, 'Réglé', act);
+  loadModule('reception', true);
+  loadDashboard(true);
+  sendLog('resolveNC','reception',ligneId,'Réglé',act);
 }
 /* ── NETTOYAGE ── */
 let _nettoyageData=[];
 
-async function loadNettoyage(){
-  const btnAdd=document.getElementById('btn-add-zone');
-  if(btnAdd)btnAdd.style.display=isAdmin()?'':'none';
-  const btnProd=document.getElementById('btn-produits');
-  if(btnProd)btnProd.style.display=isAdmin()?'':'none';
-  if(_produitsData.length===0)await loadProduits();
-  if(_nettoyageData&&_nettoyageData.length){
+async function loadNettoyage(forceRefresh = false) {
+  const btnAdd = document.getElementById('btn-add-zone');
+  if (btnAdd) btnAdd.style.display = isAdmin() ? '' : 'none';
+  const btnProd = document.getElementById('btn-produits');
+  if (btnProd) btnProd.style.display = isAdmin() ? '' : 'none';
+  if (_produitsData.length === 0) await loadProduits();
+  if (_nettoyageData && _nettoyageData.length && !forceRefresh) {
     renderNettoyage(_nettoyageData);
-    const enRetard=_nettoyageData.filter(t=>_nettoyageStatut(t)==='retard').length;
-    const b=document.getElementById('b-nettoyage');
-    if(b){b.textContent=enRetard;b.classList.toggle('on',enRetard>0);}
-    GET({action:'getNettoyagePlan'}).then(plan=>{if(plan){_nettoyageData=plan;renderNettoyage(plan);}});
+    const enRetard = _nettoyageData.filter(t => _nettoyageStatut(t) === 'retard').length;
+    const b = document.getElementById('b-nettoyage');
+    if (b) { b.textContent = enRetard; b.classList.toggle('on', enRetard > 0); }
+    // Recharge en arrière‑plan
+    GET({ action: 'getNettoyagePlan' }).then(plan => {
+      if (plan) { _nettoyageData = plan; renderNettoyage(plan); }
+    });
     return;
   }
-  document.getElementById('nettoyage-zones').innerHTML='<div class="ld"><div class="sp"></div></div>';
-  const plan=await GET({action:'getNettoyagePlan'});
-  if(!plan)return;
-  _nettoyageData=plan;
+  document.getElementById('nettoyage-zones').innerHTML = '<div class="ld"><div class="sp"></div></div>';
+  const plan = await GET({ action: 'getNettoyagePlan' }, forceRefresh);
+  if (!plan) return;
+  _nettoyageData = plan;
   renderNettoyage(plan);
-  const enRetard=plan.filter(t=>_nettoyageStatut(t)==='retard').length;
-  const b=document.getElementById('b-nettoyage');
-  if(b){b.textContent=enRetard;b.classList.toggle('on',enRetard>0);}
+  const enRetard = plan.filter(t => _nettoyageStatut(t) === 'retard').length;
+  const b = document.getElementById('b-nettoyage');
+  if (b) { b.textContent = enRetard; b.classList.toggle('on', enRetard > 0); }
 }
 function _nettoyageStatut(t){
-  if(!t['Prochaine échéance'])return'ok';
-  const today=new Date();today.setHours(0,0,0,0);
-  const d=new Date(t['Prochaine échéance']);d.setHours(0,0,0,0);
-  const diff=(d-today)/(1000*60*60*24);
-  if(diff<0)return'retard';
-  if(diff===0)return'urgent';  // ← seulement si c'est AUJOURD'HUI
-  return'ok';
+  if(!t['Prochaine échéance']) return 'ok';
+  const today = new Date();
+  today.setUTCHours(0,0,0,0);
+  const echeance = new Date(t['Prochaine échéance']);
+  echeance.setUTCHours(0,0,0,0);
+  const diff = (echeance - today) / (1000*60*60*24);
+  if(diff < 0) return 'retard';
+  if(diff === 0) return 'urgent';
+  return 'ok';
 }
 
 function renderNettoyage(plan){
@@ -1852,7 +1948,11 @@ function renderNettoyage(plan){
       </tr></thead>
       <tbody>${taches.map(t=>{
         const st=_nettoyageStatut(t);
-        const joursRestants=t['Prochaine échéance']?Math.ceil((new Date(t['Prochaine échéance'])-new Date())/(1000*60*60*24)):null;
+        const echeance = new Date(t['Prochaine échéance']);
+echeance.setUTCHours(0,0,0,0);
+const today = new Date();
+today.setUTCHours(0,0,0,0);
+const joursRestants = t['Prochaine échéance'] ? Math.ceil((echeance - today) / (1000*60*60*24)) : null;
 const stBadge=st==='retard'?'<span class="badge bnc">⚠️ En retard</span>':st==='urgent'?'<span class="badge bw">🔔 À faire aujourd\'hui</span>':joursRestants===1?'<span class="badge bsk">Dans 1 jour</span>':`<span class="badge bok">Dans ${joursRestants} jours</span>`;
         const dateAff=t['Prochaine échéance']?t['Prochaine échéance'].split('-').reverse().join('/'):'—';
         const derniere=t['Dernière exécution']?String(t['Dernière exécution']).split('-').reverse().join('/'):'Jamais';
@@ -1901,7 +2001,10 @@ async function subAddZone(){
   if(!data['Fréquence']){toast('Fréquence obligatoire','error');return;}
   const r=await POST({action:'addTache',data});
   if(!r)return;
-  toast('Zone créée ✅','success');clom();loadModule('nettoyage');
+  toast('Zone créée ✅','success');
+  clom();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
 
 function openAddElement(zone){
@@ -1924,7 +2027,10 @@ async function subAddElement(){
   if(!data['Fréquence']){toast('Fréquence obligatoire','error');return;}
   const r=await POST({action:'addTache',data});
   if(!r)return;
-  toast('Élément ajouté ✅','success');clom();loadModule('nettoyage');
+  toast('Élément ajouté ✅','success');
+  clom();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
 function openEditTache(id){
   if(!isAdmin()){toast('Accès admin uniquement','error');return;}
@@ -1951,14 +2057,19 @@ async function subEditTache(id){
   if(!data['Fréquence']){toast('Fréquence obligatoire','error');return;}
   const r=await POST({action:'updateTache',id,data});
   if(!r)return;
-  toast('Mis à jour ✅','success');clom();loadModule('nettoyage');
+  toast('Mis à jour ✅','success');
+  clom();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
 async function deleteTache(id){
   if(!isAdmin()){toast('Accès admin uniquement','error');return;}
   if(!confirm('Supprimer cette tâche ?'))return;
   const r=await POST({action:'deleteTache',id});
   if(!r)return;
-  toast('Supprimé','info');loadModule('nettoyage');
+  toast('Supprimé','info');
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
 
 function openEffectuerTache(id){
@@ -1984,7 +2095,10 @@ async function subEffectuerTache(id){
   document.querySelectorAll('#mb [name]').forEach(el=>{data[el.getAttribute('name')]=el.value.trim();});
   const r=await POST({action:'effectuerTache',id,data});
   if(!r)return;
-  toast('Nettoyage enregistré ✅','success');clom();loadModule('nettoyage');
+  toast('Nettoyage enregistré ✅','success');
+  clom();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
   sendLog('add','nettoyage',id,'Conforme','');
 }
 
@@ -2100,17 +2214,18 @@ function openAddProduit() {
   `;
 }
 
-async function subAddProduit() {
-  const data = {};
+async function subAddProduit(){
+  const data={};
   document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value)data[el.getAttribute('name')]=el.value.trim();});
   if(!data.Nom){toast('Nom obligatoire','error');return;}
-  const r = await POST({action:'addProduit', data});
-  if(!r) return;
+  const r=await POST({action:'addProduit', data});
+  if(!r)return;
   await loadProduits();
   toast('Produit ajouté ✅','success');
   openProduitsModal();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
-
 function openEditProduit(id) {
   const p = _produitsData.find(p=>p.ID_Produit===id);
   if(!p) return;
@@ -2127,24 +2242,28 @@ function openEditProduit(id) {
   `;
 }
 
-async function subEditProduit(id) {
-  const data = {};
+async function subEditProduit(id){
+  const data={};
   document.querySelectorAll('#mb [name]').forEach(el=>{data[el.getAttribute('name')]=el.value.trim();});
   if(!data.Nom){toast('Nom obligatoire','error');return;}
-  const r = await POST({action:'updateProduit', id, data});
-  if(!r) return;
+  const r=await POST({action:'updateProduit', id, data});
+  if(!r)return;
   await loadProduits();
   toast('Mis à jour ✅','success');
   openProduitsModal();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
 
-async function deleteProduit(id) {
-  if(!confirm('Supprimer ce produit ?')) return;
-  const r = await POST({action:'deleteProduit', id});
-  if(!r) return;
+async function deleteProduit(id){
+  if(!confirm('Supprimer ce produit ?'))return;
+  const r=await POST({action:'deleteProduit', id});
+  if(!r)return;
   await loadProduits();
   toast('Supprimé','info');
   openProduitsModal();
+  loadModule('nettoyage', true);
+  loadDashboard(true);
 }
 async function renderAppareilsDashboard(){
   const el=document.getElementById('appareils-dashboard');
@@ -2176,20 +2295,21 @@ const alertes=tous.filter(a=>_appareilStatut(a)==='retard');
 /* ── APPAREILS VUE ── */
 let _appareilsData = {froid:[], huiles:[]};
 
-async function loadModule_appareils(type) {
-  const container = document.getElementById(type+'-appareils-list');
-  const btnAdd = document.getElementById('btn-add-app-'+type);
-  if(btnAdd) btnAdd.style.display = isAdmin() ? '' : 'none';
-  if(_appareilsData[type]&&_appareilsData[type].length){
+async function loadModule_appareils(type, forceRefresh = false) {
+  const container = document.getElementById(type + '-appareils-list');
+  const btnAdd = document.getElementById('btn-add-app-' + type);
+  if (btnAdd) btnAdd.style.display = isAdmin() ? '' : 'none';
+  if (_appareilsData[type] && _appareilsData[type].length && !forceRefresh) {
     renderAppareilsList(type, _appareilsData[type]);
-    GET({action:'getAppareils',type}).then(appareils=>{
-      if(appareils){_appareilsData[type]=appareils;renderAppareilsList(type,appareils);}
+    // Recharge en arrière‑plan
+    GET({ action: 'getAppareils', type }).then(appareils => {
+      if (appareils) { _appareilsData[type] = appareils; renderAppareilsList(type, appareils); }
     });
     return;
   }
   container.innerHTML = '<div class="ld"><div class="sp"></div></div>';
-  const appareils = await GET({action:'getAppareils', type});
-  if(!appareils) return;
+  const appareils = await GET({ action: 'getAppareils', type }, forceRefresh);
+  if (!appareils) return;
   _appareilsData[type] = appareils;
   renderAppareilsList(type, appareils);
 }
@@ -2380,20 +2500,21 @@ function arCalcHuiles(){
   const w=document.getElementById('ar_ncw');if(w)w.style.display=conf==='Non conforme'?'':'none';
 }
 
-async function subAddReleve(type, nom) {
-  const conf = document.getElementById('ar_ch')?.value;
+async function subAddReleve(type, nom){
+  const conf=document.getElementById('ar_ch')?.value;
   if(!conf){toast('T°C obligatoire','error');return;}
   if(conf==='Non conforme'){
     if(!document.querySelector('#mb [name="Action"]')?.value?.trim()){toast('Action corrective obligatoire','error');return;}
     if(!document.getElementById('ar_rgl')?.value){toast('Statut obligatoire','error');return;}
   }
-  const d = collect();
-  d['Appareil'] = nom;
-  const r = await POST({action:'add', module:type, data:d});
-  if(!r) return;
+  const d=collect();
+  d['Appareil']=nom;
+  const r=await POST({action:'add', module:type, data:d});
+  if(!r)return;
   toast('Relevé ajouté ✅','success');
   await POST({action:'updateAppareilVerif', type, nom, date:d['Date']||today()});
-  await loadModule_appareils(type);
+  await loadModule_appareils(type, true);
+  await loadDashboard(true);
   openAppareilModal(type, nom);
   sendLog('add', type, r.id, d['Conformité'], '');
 }
@@ -2424,29 +2545,31 @@ function openAddAppareilModal(type) {
   document.getElementById('mov').classList.add('open');
 }
 
-async function subAddAppareilModal(type) {
-  const nom = document.querySelector('#mb [name="nom"]')?.value?.trim();
+async function subAddAppareilModal(type){
+  const nom=document.querySelector('#mb [name="nom"]')?.value?.trim();
   if(!nom){toast('Nom obligatoire','error');return;}
-  const data = {
-    notes:        document.querySelector('#mb [name="notes"]')?.value?.trim()||'',
+  const data={
+    notes: document.querySelector('#mb [name="notes"]')?.value?.trim()||'',
     typeControle: document.querySelector('#mb [name="typeControle"]')?.value||'',
-    tempCible:    document.querySelector('#mb [name="tempCible"]')?.value||'',
+    tempCible: document.querySelector('#mb [name="tempCible"]')?.value||'',
     tempCritique: document.querySelector('#mb [name="tempCritique"]')?.value||'',
-    frequence:    document.querySelector('#mb [name="frequence"]')?.value||''
+    frequence: document.querySelector('#mb [name="frequence"]')?.value||''
   };
-  const r = await POST({action:'addAppareil', type, nom, data});
-  if(!r) return;
+  const r=await POST({action:'addAppareil', type, nom, data});
+  if(!r)return;
   await loadAppareils(type);
   toast('Appareil ajouté ✅','success');
   clom();
-  loadModule_appareils(type);
+  loadModule_appareils(type, true);
+  loadDashboard(true);
 }
-async function deleteAppareil(type, nom) {
+async function deleteAppareil(type, nom){
   if(!confirm('Supprimer "'+nom+'" et tous ses relevés ?'))return;
-  const r = await POST({action:'deleteAppareil', type, nom});
+  const r=await POST({action:'deleteAppareil', type, nom});
   if(!r)return;
   toast('Supprimé','info');
-  loadModule_appareils(type);
+  loadModule_appareils(type, true);
+  loadDashboard(true);
 }
 
 function openEditAppareil(type, nom) {
@@ -2477,19 +2600,20 @@ function openEditAppareil(type, nom) {
   document.getElementById('mov').classList.add('open');
 }
 
-async function subEditAppareil(type, nom) {
-  const data = {
-    notes:        document.querySelector('#mb [name="notes"]')?.value?.trim()||'',
+async function subEditAppareil(type, nom){
+  const data={
+    notes: document.querySelector('#mb [name="notes"]')?.value?.trim()||'',
     typeControle: document.querySelector('#mb [name="typeControle"]')?.value||'',
-    tempCible:    document.querySelector('#mb [name="tempCible"]')?.value||'',
+    tempCible: document.querySelector('#mb [name="tempCible"]')?.value||'',
     tempCritique: document.querySelector('#mb [name="tempCritique"]')?.value||'',
-    frequence:    document.querySelector('#mb [name="frequence"]')?.value||''
+    frequence: document.querySelector('#mb [name="frequence"]')?.value||''
   };
-  const r = await POST({action:'updateAppareil', type, nom, data});
+  const r=await POST({action:'updateAppareil', type, nom, data});
   if(!r)return;
   toast('Mis à jour ✅','success');
   clom();
-  loadModule_appareils(type);
+  loadModule_appareils(type, true);
+  loadDashboard(true);
 }
 </script>
 </body>
