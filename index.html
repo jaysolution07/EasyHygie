@@ -151,6 +151,23 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
 .card-h{padding:14px 20px;border-bottom:1.5px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
 .card-t{font-family:var(--fh);font-weight:700;font-size:14px;color:var(--tx)}
 .card-b{padding:18px 20px}
+.chart-shell{padding:16px 18px 18px;background:linear-gradient(180deg,rgba(247,250,255,.96),rgba(255,255,255,.98))}
+.chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.chart-toolbar-left{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chart-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chart-select{background:var(--sf);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:8px 11px;border-radius:12px;cursor:pointer;outline:none;min-width:132px;box-shadow:0 6px 18px rgba(15,36,71,.05)}
+.chart-select:focus{border-color:var(--bl);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.chart-switch{display:flex;align-items:center;gap:6px;padding:4px;background:#eef4ff;border:1px solid #d7e5fb;border-radius:999px}
+.chart-chip{border:none;background:transparent;color:var(--mu);font-family:var(--fh);font-size:11.5px;font-weight:700;padding:8px 12px;border-radius:999px;cursor:pointer;transition:all .18s}
+.chart-chip.active{background:linear-gradient(135deg,#0f766e,#0ea5e9);color:#fff;box-shadow:0 10px 24px rgba(14,165,233,.22)}
+.chart-chip:hover:not(.active){color:var(--tx);background:rgba(255,255,255,.75)}
+.chart-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.chart-stat{background:rgba(255,255,255,.9);border:1px solid #dbe8fb;border-radius:16px;padding:12px 14px;box-shadow:0 10px 24px rgba(15,36,71,.05)}
+.chart-stat-k{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--mu);margin-bottom:5px;font-weight:700}
+.chart-stat-v{font-family:var(--fh);font-size:19px;font-weight:800;color:var(--tx)}
+.chart-stat-s{font-size:11px;color:var(--mu);margin-top:2px}
+.chart-canvas-wrap{height:320px;position:relative;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(242,247,255,.96));border:1px solid #dbe8fb;border-radius:20px;padding:14px 14px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.85)}
+.chart-empty{height:320px;display:flex;align-items:center;justify-content:center;color:var(--mu);font-size:12.5px;background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(242,247,255,.96));border:1px solid #dbe8fb;border-radius:20px}
 
 /* KPI */
 .kgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:28px}
@@ -164,6 +181,10 @@ main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
 .kd .kv{color:var(--dg)}
 .dr{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
 @media(max-width:900px){.dr{grid-template-columns:1fr}}
+@media(max-width:760px){
+  .chart-stats{grid-template-columns:1fr}
+  .chart-canvas-wrap{height:280px}
+}
 
 /* BADGES */
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:600;letter-spacing:.3px}
@@ -531,9 +552,44 @@ tbody tr:hover{background:var(--sf2)}
     <div class="card" style="grid-column:1/-1">
       <div class="card-h">
         <div class="card-t">🌡 Courbes Contrôle Froid</div>
-        <select id="chart-sel" style="background:var(--sf2);border:1.5px solid var(--bd);color:var(--tx);font-family:var(--fh);font-size:12px;padding:6px 10px;border-radius:var(--rs);cursor:pointer;outline:none" onchange="renderFroidChart()"><option value="">Tous les appareils</option></select>
+        <div class="chart-toolbar-left">
+          <div class="chart-switch">
+            <button type="button" class="chart-chip active" id="chart-mode-day" onclick="setFroidChartMode('day')">Jour</button>
+            <button type="button" class="chart-chip" id="chart-mode-month" onclick="setFroidChartMode('month')">Mois</button>
+            <button type="button" class="chart-chip" id="chart-mode-year" onclick="setFroidChartMode('year')">Année</button>
+          </div>
+        </div>
       </div>
-      <div class="card-b" style="height:260px;position:relative"><canvas id="froid-chart"></canvas></div>
+      <div class="card-b chart-shell">
+        <div class="chart-toolbar">
+          <div class="chart-filters">
+            <select id="chart-period" class="chart-select" onchange="renderFroidChart()"></select>
+            <select id="chart-sel" class="chart-select" onchange="renderFroidChart()"><option value="">Tous les appareils</option></select>
+          </div>
+          <div id="chart-context" style="font-size:11px;color:var(--mu)"></div>
+        </div>
+        <div class="chart-stats">
+          <div class="chart-stat">
+            <div class="chart-stat-k">Points affichés</div>
+            <div class="chart-stat-v" id="chart-stat-points">0</div>
+            <div class="chart-stat-s" id="chart-stat-range">Aucune période</div>
+          </div>
+          <div class="chart-stat">
+            <div class="chart-stat-k">Température moyenne</div>
+            <div class="chart-stat-v" id="chart-stat-avg">--</div>
+            <div class="chart-stat-s">Sur la sélection courante</div>
+          </div>
+          <div class="chart-stat">
+            <div class="chart-stat-k">Min / Max</div>
+            <div class="chart-stat-v" id="chart-stat-minmax">--</div>
+            <div class="chart-stat-s">Lecture rapide du lot affiché</div>
+          </div>
+        </div>
+        <div class="chart-canvas-wrap">
+          <canvas id="froid-chart"></canvas>
+          <div id="froid-chart-empty" class="chart-empty" style="display:none">Aucun relevé pour ce filtre</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -607,7 +663,7 @@ tbody tr:hover{background:var(--sf2)}
             <select id="log-filter-module" onchange="renderLogs()"><option value="">Tous les modules</option><option value="reception">Réception</option><option value="froid">Froid</option><option value="huiles">Huiles</option><option value="refroidissement">Refroidissement</option><option value="congelation">Congélation</option><option value="remise">Remise en T°</option></select>
             <select id="log-filter-action" onchange="renderLogs()"><option value="">Toutes les actions</option><option value="add">Ajout</option><option value="update">Modification</option><option value="delete">Suppression</option><option value="resolveNC">Résolution NC</option></select>
             <input type="text" placeholder="Rechercher…" id="log-search" oninput="renderLogs()" style="flex:1;min-width:160px"/>
-            <button class="btn bg sm" onclick="S.logs=[];renderLogs()" id="btn-vider-logs" style="display:none">🗑 Vider</button>
+            <button class="btn bg sm" onclick="purgeActionLogs()" id="btn-vider-logs" style="display:none">🗑 Vider</button>
           </div>
           <div class="card">
             <div class="card-h"><div class="card-t">📋 Journal d'activité</div><span id="log-count" style="font-size:11px;color:var(--mu)"></span></div>
@@ -959,6 +1015,8 @@ function invalidateCachesForPayload(b) {
   if (b.action === 'addAppareil' || b.action === 'deleteAppareil' || b.action === 'updateAppareil' || b.action === 'updateAppareilVerif') invalidateCache('"action":"getAppareils"');
   if (b.action === 'addTache' || b.action === 'updateTache' || b.action === 'deleteTache' || b.action === 'effectuerTache') invalidateCache('"action":"getNettoyagePlan"');
   if (b.action === 'addProduit' || b.action === 'updateProduit' || b.action === 'deleteProduit') invalidateCache('"action":"getProduits"');
+  if (b.action === 'deleteLoginLog' || b.action === 'purgeLoginLogs' || b.action === 'loginLog') invalidateCache('"action":"getLoginLogs"');
+  if (b.action === 'addActionLog' || b.action === 'purgeActionLogs') invalidateCache('"action":"getActionLogs"');
   if (b.action === 'purgeAll') cache.clear();
   invalidateCache('"action":"getDashboardFull"');
   invalidateCache('"action":"getActionLogs"');
@@ -1002,7 +1060,7 @@ function scheduleServerRefresh(delay = 1200) {
     else if (['reception','refroidissement','congelation','remise'].includes(S.panel)) loadModule(S.panel, false);
     else if (S.panel === 'nettoyage') loadNettoyage(false);
     else if (S.panel === 'froid' || S.panel === 'huiles') loadModule_appareils(S.panel, false);
-    else if (S.panel === 'logs') loadAndRenderLogs();
+    else if (S.panel === 'logs') loadAndRenderLogs(true);
   }, delay);
 }
 function syncAfterLocal(payload, options={}) {
@@ -1066,16 +1124,125 @@ window.addEventListener('online', ()=>processQueue());
 const today=()=>new Date().toISOString().slice(0,10);
 const nowT=()=>{const n=new Date();return p2(n.getHours())+':'+p2(n.getMinutes());};
 const p2=v=>String(v).padStart(2,'0');
+const FROID_CHART_MONTHS=['Jan','Fev','Mar','Avr','Mai','Juin','Juil','Aout','Sept','Oct','Nov','Dec'];
 const minBt=(a,b)=>{const[h1,m1]=a.split(':').map(Number);const[h2,m2]=b.split(':').map(Number);return(h2*60+m2)-(h1*60+m1);};
 const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 const tsNow=()=>new Date().toISOString().replace('T',' ').slice(0,19);
 const tempId=(prefix='tmp')=>`${prefix}-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
-const isTempIdentifier=id=>/^(temp|tmp|row|releve|bl|ligne|prod|tache)-/i.test(String(id||''));
+const isTempIdentifier=id=>/^(temp|tmp|row|releve|bl|ligne|prod|tache)-/.test(String(id||''));
+function parseChartDate(value){
+  if(!value) return null;
+  const datePart=String(value).slice(0,10);
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(datePart)) return null;
+  const d=new Date(datePart+'T00:00:00');
+  return isNaN(d)?null:d;
+}
+function getFroidChartMode(){
+  return document.getElementById('chart-mode-day')?.classList.contains('active') ? 'day'
+    : document.getElementById('chart-mode-month')?.classList.contains('active') ? 'month'
+    : 'year';
+}
+function setFroidChartMode(mode){
+  ['day','month','year'].forEach(k=>document.getElementById('chart-mode-'+k)?.classList.toggle('active',k===mode));
+  populateFroidChartPeriods(true);
+  renderFroidChart();
+}
+function formatFroidPeriodLabel(mode, value){
+  if(!value) return 'Aucune periode';
+  if(mode==='day'){
+    const d=parseChartDate(value);
+    return d ? `${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}` : value;
+  }
+  if(mode==='month'){
+    const [y,m]=String(value).split('-');
+    const monthIndex=Math.max(0,Math.min(11,Number(m)-1));
+    return `${FROID_CHART_MONTHS[monthIndex]} ${y}`;
+  }
+  return String(value);
+}
+function populateFroidChartPeriods(preferLatest=false){
+  const sel=document.getElementById('chart-period');
+  if(!sel) return;
+  const rows=S.data.froid||[];
+  const mode=getFroidChartMode();
+  const current=sel.value;
+  const values=[...new Set(rows.map(r=>{
+    const datePart=String(r['Date']||'').slice(0,10);
+    if(!datePart) return '';
+    if(mode==='day') return datePart;
+    if(mode==='month') return datePart.slice(0,7);
+    return datePart.slice(0,4);
+  }).filter(Boolean))].sort();
+  if(!values.length){
+    sel.innerHTML='<option value="">Aucune donnee</option>';
+    return;
+  }
+  const nextValue=(preferLatest||!values.includes(current)) ? values[values.length-1] : current;
+  sel.innerHTML=values.map(v=>`<option value="${v}">${formatFroidPeriodLabel(mode,v)}</option>`).join('');
+  sel.value=nextValue;
+}
+function updateFroidChartStats(points, mode, periodValue){
+  const totalEl=document.getElementById('chart-stat-points');
+  const rangeEl=document.getElementById('chart-stat-range');
+  const avgEl=document.getElementById('chart-stat-avg');
+  const minMaxEl=document.getElementById('chart-stat-minmax');
+  const contextEl=document.getElementById('chart-context');
+  if(!totalEl||!rangeEl||!avgEl||!minMaxEl||!contextEl) return;
+  rangeEl.textContent=formatFroidPeriodLabel(mode, periodValue);
+  totalEl.textContent=String(points.length);
+  if(!points.length){
+    avgEl.textContent='--';
+    minMaxEl.textContent='--';
+    contextEl.textContent='Aucune donnee sur la selection courante';
+    return;
+  }
+  const values=points.map(p=>p.y).filter(v=>typeof v==='number'&&!isNaN(v));
+  const avg=values.reduce((sum,v)=>sum+v,0)/values.length;
+  const min=Math.min(...values);
+  const max=Math.max(...values);
+  avgEl.textContent=`${avg.toFixed(1)}°C`;
+  minMaxEl.textContent=`${min.toFixed(1)}° / ${max.toFixed(1)}°`;
+  contextEl.textContent=`Vue ${mode==='day'?'journaliere':mode==='month'?'mensuelle':'annuelle'} · ${values.length} releve${values.length>1?'s':''}`;
+}
+function getFroidTempValue(row){
+  const direct=row?.['T°C entrée'];
+  if(direct!==undefined) return direct;
+  const key=Object.keys(row||{}).find(k=>{
+    const s=String(k).toLowerCase();
+    return s.includes('t') && s.includes('entr') && s.includes('c');
+  });
+  return key ? row[key] : undefined;
+}
+function getFroidRetardCount(appareils){
+  return (appareils||[]).filter(a=>_appareilStatut(a)==='retard').length;
+}
+function updateFroidSidebarBadge(appareils){
+  const b=document.getElementById('b-froid');
+  if(!b) return;
+  const enRetard=getFroidRetardCount(appareils||_appareilsData?.froid||[]);
+  b.textContent=enRetard;
+  b.classList.toggle('on',enRetard>0);
+}
 function formatLogId(id){
   return isTempIdentifier(id) ? '<span style="color:var(--mu);font-size:11px">Synchronisation…</span>' : `<span style="color:var(--mu);font-size:11px">${esc(id||'')}</span>`;
 }
 
 /* ── API HACCP ── */
+function mergePendingLocalLogs(serverLogs){
+  const pending=(S.logs||[]).filter(l=>isTempIdentifier(l.ID_NC));
+  const merged=[...pending];
+  (serverLogs||[]).forEach(log=>{
+    const exists=merged.some(item=>
+      String(item.Timestamp||'')===String(log.Timestamp||'') &&
+      String(item.User||'')===String(log.User||'') &&
+      String(item.Module||'')===String(log.Module||'') &&
+      String(item.Action||'')===String(log.Action||'') &&
+      String(item.ID_NC||'')===String(log.ID_NC||'')
+    );
+    if(!exists) merged.push(log);
+  });
+  return merged.sort((a,b)=>String(b.Timestamp||'').localeCompare(String(a.Timestamp||'')));
+}
 async function GET(params, forceRefresh = false) {
   if(!API_URL){toast('Non connecté','error');return null;}
   const cacheKey = `GET_${JSON.stringify(params)}`;
@@ -1242,6 +1409,7 @@ function renderDashboardData(full) {
 
   // Badges sidebar
   Object.entries(dash).forEach(([k,m])=>{const b=document.getElementById('b-'+k);if(b){b.textContent=m.nonRegle;b.classList.toggle('on',m.nonRegle>0);}});
+  updateFroidSidebarBadge(appareils?.froid||[]);
 
   // NC ouvertes
   const ncList = document.getElementById('nc-list');
@@ -1256,6 +1424,7 @@ function renderDashboardData(full) {
   const apps=[...new Set(froidData.map(r=>r['Appareil']).filter(Boolean))];
   const sel=document.getElementById('chart-sel');
   sel.innerHTML='<option value="">Tous les appareils</option>'+apps.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  populateFroidChartPeriods(true);
   renderFroidChart();
 
   // Thermo widget
@@ -1326,6 +1495,92 @@ function renderFroidChart(){
 }
 
 /* ── MODULE TABLE ── */
+
+async function loadFroidChart(){
+  const rows=await GET({action:'getAll',module:'froid'});if(!rows){S.data.froid=[];return;}
+  S.data.froid=rows;
+  const apps=[...new Set(rows.map(r=>r['Appareil']).filter(Boolean))];
+  const sel=document.getElementById('chart-sel');
+  sel.innerHTML='<option value="">Tous les appareils</option>'+apps.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join('');
+  populateFroidChartPeriods(true);
+  renderFroidChart();
+  updateThermoWidget();
+}
+function renderFroidChart(){
+  const rows=S.data.froid||[];
+  const flt=document.getElementById('chart-sel')?.value||'';
+  const periodSel=document.getElementById('chart-period');
+  const mode=getFroidChartMode();
+  if(periodSel && !periodSel.options.length) populateFroidChartPeriods(true);
+  const periodValue=periodSel?.value||'';
+  const canvas=document.getElementById('froid-chart');
+  const empty=document.getElementById('froid-chart-empty');
+  const filtered=(flt?rows.filter(r=>r['Appareil']===flt):rows).filter(r=>{
+    const datePart=String(r['Date']||'').slice(0,10);
+    if(!datePart || !periodValue) return false;
+    if(mode==='day') return datePart===periodValue;
+    if(mode==='month') return datePart.slice(0,7)===periodValue;
+    return datePart.slice(0,4)===periodValue;
+  }).sort((a,b)=>{
+    const aKey=`${a['Date']||''} ${a['Heure']||'00:00'}`;
+    const bKey=`${b['Date']||''} ${b['Heure']||'00:00'}`;
+    return aKey.localeCompare(bKey);
+  });
+  const apps=[...new Set(filtered.map(r=>r['Appareil']).filter(Boolean))];
+  const colors=['#2563eb','#0891b2','#d97706','#dc2626','#0f766e','#7c3aed'];
+  const labels=[];
+  const seriesByApp={};
+  const flatPoints=[];
+  const buildLabel=row=>{
+    const datePart=String(row['Date']||'').slice(0,10);
+    const d=parseChartDate(datePart);
+    if(mode==='day') return String(row['Heure']||'').slice(0,5)||'--:--';
+    if(mode==='month') return d ? `${p2(d.getDate())}/${p2(d.getMonth()+1)}` : datePart;
+    return d ? FROID_CHART_MONTHS[d.getMonth()] : datePart.slice(5,7);
+  };
+  filtered.forEach(row=>{
+    const rawValue=getFroidTempValue(row);
+    const value=Number.parseFloat(rawValue);
+    if(Number.isNaN(value)) return;
+    const label=buildLabel(row);
+    const app=row['Appareil']||'Sans nom';
+    if(!labels.includes(label)) labels.push(label);
+    if(!seriesByApp[app]) seriesByApp[app]={};
+    if(!seriesByApp[app][label]) seriesByApp[app][label]=[];
+    seriesByApp[app][label].push(value);
+    flatPoints.push({x:label,y:value,app});
+  });
+  updateFroidChartStats(flatPoints, mode, periodValue);
+  if(S.chart)S.chart.destroy();
+  if(!flatPoints.length){
+    if(canvas) canvas.style.opacity='0';
+    if(empty) empty.style.display='flex';
+    return;
+  }
+  if(canvas) canvas.style.opacity='1';
+  if(empty) empty.style.display='none';
+  const datasets=apps.map((app,i)=>({
+    label:app,
+    data:labels.map(label=>{
+      const bucket=seriesByApp[app]?.[label];
+      if(!bucket?.length) return null;
+      const avg=bucket.reduce((sum,v)=>sum+v,0)/bucket.length;
+      return Number(avg.toFixed(2));
+    }),
+    borderColor:colors[i%colors.length],
+    backgroundColor:colors[i%colors.length]+'20',
+    borderWidth:3,
+    pointRadius:mode==='year'?3:4,
+    pointHoverRadius:6,
+    pointBackgroundColor:'#ffffff',
+    pointBorderWidth:2,
+    tension:.35,
+    fill:true,
+    spanGaps:true
+  }));
+  const ctx=canvas.getContext('2d');
+  S.chart=new Chart(ctx,{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{position:'top',align:'start',labels:{usePointStyle:true,boxWidth:8,color:'#5c7394',font:{family:'Plus Jakarta Sans',size:11,weight:'700'}}},tooltip:{backgroundColor:'#fff',borderColor:'#d0e0f7',borderWidth:1.5,titleColor:'#0f2447',bodyColor:'#5c7394',padding:12,cornerRadius:12,callbacks:{label:ctx=>`${ctx.dataset.label}: ${ctx.parsed.y}°C`}}},scales:{x:{ticks:{color:'#7b8faa',font:{size:10,weight:'600'},maxRotation:0,autoSkip:true,maxTicksLimit:mode==='year'?12:8},grid:{display:false,drawBorder:false}},y:{ticks:{color:'#7b8faa',font:{size:10},callback:v=>v+'°C',maxTicksLimit:6},grid:{color:'rgba(215,229,251,.8)',drawBorder:false}}}}});
+}
 
 function renderTable(m,rows){
   const tb=document.querySelector(`#table-${m} tbody`);
@@ -1413,12 +1668,93 @@ async function sendLog(actionType, module, idNC, conformite, details){
   }catch(e){}
 }
 /* ── TEAM ── */
+function formatLogId(id){
+  return isTempIdentifier(id) ? '<span style="color:var(--mu);font-size:11px">RÃ©f. en attente</span>' : `<span style="color:var(--mu);font-size:11px">${esc(id||'')}</span>`;
+}
+function pushActionLogRemote(actionType, module, idNC, conformite, details){
+  if(!API_URL || !idNC || isTempIdentifier(idNC)) return;
+  try{
+    invalidateCache('"action":"getActionLogs"');
+    const u=new URL(API_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload',JSON.stringify({
+      action:'addActionLog',
+      userId:_sess?.id||'',
+      userName:_sess?.nom||'',
+      module:module||'',
+      actionType:actionType||'',
+      idNC:idNC||'',
+      conformite:conformite||'',
+      details:details||''
+    }));
+    new Image().src = u.toString();
+  }catch(e){}
+}
+/*
+async function loadAndRenderLogs(forceRefresh = false){
+  const tl=document.getElementById('log-timeline');
+  tl.innerHTML='<div class="ld"><div class="sp"></div>Chargementâ€¦</div>';
+  const logs=await GET({action:'getActionLogs'}, forceRefresh);
+  if(logs){
+    const serverLogs=logs.map(l=>({
+      Timestamp:l.Timestamp,
+      User:l.UserNom,
+      Module:l.Module,
+      Action:l.Action,
+      ID_NC:l.ID_NC,
+      ConformitÃ©:l.ConformitÃ©,
+      DÃ©tails:l.DÃ©tails
+    }));
+    S.logs=mergePendingLocalLogs(serverLogs);
+  }
+  renderLogs();
+}
+async function sendLog(actionType, module, idNC, conformite, details){
+  S.logs.unshift({Timestamp:tsNow(),User:_sess?.nom||'',Module:module,Action:actionType,ID_NC:idNC||'',ConformitÃ©:conformite||'',DÃ©tails:details||''});
+  if(S.panel==='logs')renderLogs();
+  pushActionLogRemote(actionType, module, idNC, conformite, details);
+}
+*/
 async function loadTeam(){
   if(!isAdmin()){toast('Accès admin uniquement','error');return;}
   document.getElementById('team-grid').innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
   const users=await MGET({action:'getUsers',callerId:_sess.id,callerMdp:_sess.Mdp||''});
   if(!users)return;
   S.team=users;renderTeam(users);
+}
+async function loadAndRenderLogs(forceRefresh = false){
+  const tl=document.getElementById('log-timeline');
+  tl.innerHTML='<div class="ld"><div class="sp"></div>Chargement...</div>';
+  const logs=await GET({action:'getActionLogs'}, forceRefresh);
+  if(logs){
+    const serverLogs=logs.map(l=>({
+      Timestamp:l.Timestamp,
+      User:l.UserNom,
+      Module:l.Module,
+      Action:l.Action,
+      ID_NC:l.ID_NC,
+      ['Conformit\u00e9']:l['Conformit\u00e9'],
+      ['D\u00e9tails']:l['D\u00e9tails']
+    }));
+    S.logs=mergePendingLocalLogs(serverLogs);
+  }
+  renderLogs();
+}
+async function sendLog(actionType, module, idNC, conformite, details){
+  S.logs.unshift({
+    Timestamp:tsNow(),
+    User:_sess?.nom||'',
+    Module:module,
+    Action:actionType,
+    ID_NC:idNC||'',
+    ['Conformit\u00e9']:conformite||'',
+    ['D\u00e9tails']:details||''
+  });
+  if(S.panel==='logs')renderLogs();
+  pushActionLogRemote(actionType, module, idNC, conformite, details);
+}
+function formatLogId(id){
+  return isTempIdentifier(id) ? '<span style="color:var(--mu);font-size:11px">Ref. en attente</span>' : `<span style="color:var(--mu);font-size:11px">${esc(id||'')}</span>`;
 }
 function renderTeam(users){
   if(!users.length){document.getElementById('team-grid').innerHTML='<div class="empty"><div class="ei">👥</div><p>Aucun membre</p></div>';return;}
@@ -1494,7 +1830,7 @@ async function deleteUser(id){
 }
 
 /* ── LOGIN LOGS ── */
-async function loadLoginLogs(){
+async function loadLoginLogs(forceRefresh = false){
   if(!isAdmin()){toast('Accès admin uniquement','error');return;}
   // Bouton purge
   const bar=document.querySelector('#panel-loginlogs .log-filters');
@@ -1507,7 +1843,7 @@ async function loadLoginLogs(){
   }
   const tb=document.querySelector('#table-loginlogs tbody');
   tb.innerHTML='<tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr>';
-  const logs=await GET({action:'getLoginLogs'});
+  const logs=await GET({action:'getLoginLogs'}, forceRefresh);
   if(!logs)return;
   S.loginLogs=logs;renderLoginLogs();
 }
@@ -1516,7 +1852,7 @@ async function purgeAllLoginLogs(){
   const r=await POST({action:'purgeLoginLogs'});
   if(!r)return;
   toast('Journal vidé','info');
-  loadLoginLogs();
+  loadLoginLogs(true);
 }
 
 async function deleteLoginLog(ts, userId){
@@ -1524,7 +1860,7 @@ async function deleteLoginLog(ts, userId){
   const r=await POST({action:'deleteLoginLog', ts, userId});
   if(!r)return;
   toast('Supprimé','info');
-  loadLoginLogs();
+  loadLoginLogs(true);
 }
 function renderLoginLogs(){
   const srch=(document.getElementById('ll-search')?.value||'').toLowerCase();
@@ -1739,7 +2075,7 @@ async function subEdit(mod,id){
   saveLocalSnapshot();
   clom();
   toast('Modification enregistrée localement, synchronisation en cours…','info');
-  syncAfterLocal({action:'update', module:mod, id, data:d});
+  syncAfterLocal({action:'update', module:mod, id, data:d}, { logOnSuccess: { actionType:'update', module:mod, conformite:d['ConformitÃ©']||'', details:'' } });
   sendLog('update',mod,id,d['Conformité']||'','');
   scheduleServerRefresh();
 }
@@ -1755,7 +2091,7 @@ async function subRes(mod,id){
   }
   clom();
   toast('NC clôturée localement, synchronisation en cours…','info');
-  syncAfterLocal({action:'resolveNC',module:mod,id,data:{action:act}});
+  syncAfterLocal({action:'resolveNC',module:mod,id,data:{action:act}}, { logOnSuccess: { actionType:'resolveNC', module:mod, conformite:'RÃ©glÃ©', details:act } });
   sendLog('resolveNC',mod,id,'Réglé',act);
   scheduleServerRefresh();
 }
@@ -1770,7 +2106,7 @@ async function delRow(mod,id){
     saveLocalSnapshot();
   }
   toast('Suppression locale effectuée, synchronisation en cours…','info');
-  syncAfterLocal({action:'delete', module:mod, id});
+  syncAfterLocal({action:'delete', module:mod, id}, { logOnSuccess: { actionType:'delete', module:mod, conformite:'', details:'' } });
   sendLog('delete',mod,id,'','');
   scheduleServerRefresh();
 }
@@ -2153,7 +2489,7 @@ async function subEditLigne(blId, ligneId){
     saveLocalSnapshot();
   }
   toast('Modification locale enregistrée, synchronisation en cours…','info');
-  syncAfterLocal({action:'updateLigne', ligneId, data:d});
+  syncAfterLocal({action:'updateLigne', ligneId, data:d}, { logOnSuccess: { actionType:'update', module:'reception', conformite:d['ConformitÃ©']||'', details:'' } });
   openBLDetail(blId);
   sendLog('update','reception',ligneId,d['Conformité'],'');
   scheduleServerRefresh();
@@ -2171,7 +2507,7 @@ async function deleteLigne(ligneId, blId){
     saveLocalSnapshot();
   }
   toast('Suppression locale effectuée, synchronisation en cours…','info');
-  syncAfterLocal({action:'deleteLigne', ligneId});
+  syncAfterLocal({action:'deleteLigne', ligneId}, { logOnSuccess: { actionType:'delete', module:'reception', conformite:'', details:'' } });
   const remainingBl=_blData.find(b=>b.ID_BL===blId);
   if(remainingBl && remainingBl.lignes.length) openBLDetail(blId);
   else clom();
@@ -2185,7 +2521,7 @@ async function deleteBL(blId){
   renderBLList(_blData);
   saveLocalSnapshot();
   toast('BL supprimé localement, synchronisation en cours…','info');
-  syncAfterLocal({action:'deleteBL', blId});
+  syncAfterLocal({action:'deleteBL', blId}, { logOnSuccess: { actionType:'delete', module:'reception', conformite:'', details:'' } });
   sendLog('delete','reception',blId,'','');
   scheduleServerRefresh();
 }
@@ -2219,7 +2555,7 @@ async function subResLigne(ligneId){
   saveLocalSnapshot();
   clom();
   toast('NC clôturée localement, synchronisation en cours…','info');
-  syncAfterLocal({action:'resolveLigneNC', ligneId, data:{action:act}});
+  syncAfterLocal({action:'resolveLigneNC', ligneId, data:{action:act}}, { logOnSuccess: { actionType:'resolveNC', module:'reception', conformite:'RÃ©glÃ©', details:act } });
   sendLog('resolveNC','reception',ligneId,'Réglé',act);
   scheduleServerRefresh();
 }
@@ -2643,6 +2979,7 @@ async function renderAppareilsDashboard(){
     GET({action:'getAppareils',type:'froid'}),
     GET({action:'getAppareils',type:'huiles'})
   ]);
+  updateFroidSidebarBadge(froid||[]);
   const tous=[...(froid||[]),...(huiles||[])];
 const alertes=tous.filter(a=>_appareilStatut(a)==='retard');
   if(!alertes.length){el.innerHTML='<div class="empty"><div class="ei">✅</div><p>Tous les appareils sont à jour</p></div>';return;}
@@ -2697,6 +3034,7 @@ function _appareilStatut(app) {
 }
 
 function renderAppareilsList(type, appareils) {
+  if(type==='froid') updateFroidSidebarBadge(appareils);
   const container = document.getElementById(type+'-appareils-list');
   if(!appareils.length) {
     container.innerHTML = '<div class="empty"><div class="ei">'+(type==='froid'?'❄️':'🛢')+'</div><p>Aucun appareil configuré</p></div>';
@@ -3007,6 +3345,185 @@ async function subEditAppareil(type, nom){
   scheduleServerRefresh();
 }
 
+function getLogConformite(log){
+  return log?.['Conformité'] ?? log?.['ConformitÃ©'] ?? log?.Conformite ?? '';
+}
+function getLogDetails(log){
+  return log?.['Détails'] ?? log?.['DÃ©tails'] ?? log?.Details ?? '';
+}
+function normalizeActionLog(log){
+  return {
+    Timestamp: log?.Timestamp || '',
+    User: log?.User || log?.UserNom || '',
+    Module: log?.Module || '',
+    Action: log?.Action || '',
+    ID_NC: log?.ID_NC || '',
+    ['Conformité']: getLogConformite(log),
+    ['Détails']: getLogDetails(log)
+  };
+}
+function formatLogId(id){
+  return `<span style="color:var(--mu);font-size:11px">${esc(id||'')}</span>`;
+}
+function pushActionLogRemote(actionType, module, idNC, conformite, details){
+  if(!API_URL || !idNC || isTempIdentifier(idNC)) return;
+  try{
+    invalidateCache('"action":"getActionLogs"');
+    const u=new URL(API_URL);
+    u.searchParams.set('method','POST');
+    u.searchParams.set('payload',JSON.stringify({
+      action:'addActionLog',
+      userId:_sess?.id||'',
+      userName:_sess?.nom||'',
+      module:module||'',
+      actionType:actionType||'',
+      idNC:idNC||'',
+      conformite:conformite||'',
+      details:details||''
+    }));
+    new Image().src=u.toString();
+  }catch(e){}
+}
+function renderLogs(){
+  const logs=(S.logs||[]).map(normalizeActionLog);
+  const modF=document.getElementById('log-filter-module')?.value||'';
+  const actF=document.getElementById('log-filter-action')?.value||'';
+  const srch=(document.getElementById('log-search')?.value||'').toLowerCase();
+  const filtered=logs.filter(l=>{
+    if(modF&&l.Module!==modF) return false;
+    if(actF&&l.Action!==actF) return false;
+    if(srch&&!Object.values(l).some(v=>String(v).toLowerCase().includes(srch))) return false;
+    return true;
+  });
+  document.getElementById('ls-total').textContent=logs.length;
+  document.getElementById('ls-adds').textContent=logs.filter(l=>l.Action==='add').length;
+  document.getElementById('ls-nc').textContent=logs.filter(l=>getLogConformite(l)==='Non conforme').length;
+  document.getElementById('ls-resolved').textContent=logs.filter(l=>l.Action==='resolveNC').length;
+  document.getElementById('log-count').textContent=filtered.length+' entrée'+(filtered.length>1?'s':'');
+  const tl=document.getElementById('log-timeline');
+  if(!filtered.length){tl.innerHTML='<div class="empty"><div class="ei">📋</div><p>Aucun journal</p></div>';return;}
+  const dc={add:'add',update:'update',delete:'delete',resolveNC:'resolve'};
+  const al={add:'Ajout',update:'Modification',delete:'Suppression',resolveNC:'NC Résolue'};
+  const mi={reception:'🚚',froid:'❄️',huiles:'🛢',refroidissement:'🌡',congelation:'🧊',remise:'♨️',nettoyage:'🧹'};
+  tl.innerHTML=filtered.map(l=>`<div class="log-entry"><div class="log-dot ${dc[l.Action]||'add'}"></div><div class="log-main"><div class="log-title">${al[l.Action]||l.Action}<span class="log-badge-module">${mi[l.Module]||''} ${MM[l.Module]?.label||l.Module}</span>${l.ID_NC?formatLogId(l.ID_NC):''}</div><div class="log-meta">${getLogConformite(l)?`<span class="badge ${getLogConformite(l)==='Non conforme'?'bnc':'bok'}" style="font-size:10px">${getLogConformite(l)}</span>`:''} ${l.User?`<span>${esc(l.User)}</span>`:''}</div></div><div class="log-ts">${formatTs(l.Timestamp||'')}</div></div>`).join('');
+}
+async function loadAndRenderLogs(forceRefresh = false){
+  const tl=document.getElementById('log-timeline');
+  tl.innerHTML='<div class="ld"><div class="sp"></div>Chargement...</div>';
+  const logs=await GET({action:'getActionLogs'}, forceRefresh);
+  if(logs){
+    const serverLogs=logs.map(normalizeActionLog);
+    S.logs=mergePendingLocalLogs(serverLogs);
+  }
+  renderLogs();
+}
+async function sendLog(actionType, module, idNC, conformite, details){
+  const entry=normalizeActionLog({
+    Timestamp:tsNow(),
+    User:_sess?.nom||'',
+    Module:module,
+    Action:actionType,
+    ID_NC:idNC||'',
+    Conformite:conformite||'',
+    Details:details||''
+  });
+  S.logs.unshift(entry);
+  if(S.panel==='logs') renderLogs();
+  pushActionLogRemote(actionType, module, idNC, conformite, details);
+}
+function mergePendingLocalLogs(serverLogs){
+  const local=(S.logs||[]).map(normalizeActionLog).filter(l=>l._local||isTempIdentifier(l.ID_NC));
+  const merged=[...local];
+  (serverLogs||[]).map(normalizeActionLog).forEach(log=>{
+    const exists=merged.some(item=>{
+      const sameCore=
+        String(item.User||'')===String(log.User||'') &&
+        String(item.Module||'')===String(log.Module||'') &&
+        String(item.Action||'')===String(log.Action||'') &&
+        String(item.ID_NC||'')===String(log.ID_NC||'');
+      if(!sameCore) return false;
+      const parseTs=s=>{
+        const m=String(s||'').match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2}):(\d{2})$/);
+        if(!m) return NaN;
+        return new Date(Number(m[3]),Number(m[2])-1,Number(m[1]),Number(m[4]),Number(m[5]),Number(m[6])).getTime();
+      };
+      const a=parseTs(item.Timestamp), b=parseTs(log.Timestamp);
+      return !Number.isNaN(a) && !Number.isNaN(b) ? Math.abs(a-b) <= 10000 : true;
+    });
+    if(!exists) merged.push(log);
+  });
+  return merged.sort((a,b)=>String(b.Timestamp||'').localeCompare(String(a.Timestamp||'')));
+}
+async function pushActionLogRemote(actionType, module, idNC, conformite, details){
+  if(!API_URL || !idNC || isTempIdentifier(idNC)) return false;
+  try{
+    await POST_NOW({
+      action:'addActionLog',
+      userId:_sess?.id||'',
+      userName:_sess?.nom||'',
+      module:module||'',
+      actionType:actionType||'',
+      idNC:idNC||'',
+      conformite:conformite||'',
+      details:details||''
+    });
+    invalidateCache('"action":"getActionLogs"');
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+async function loadAndRenderLogs(forceRefresh = false){
+  const tl=document.getElementById('log-timeline');
+  tl.innerHTML='<div class="ld"><div class="sp"></div>Chargement...</div>';
+  const logs=await GET({action:'getActionLogs'}, forceRefresh);
+  const serverLogs=(logs||[]).map(normalizeActionLog);
+  S.logs=mergePendingLocalLogs(serverLogs);
+  renderLogs();
+}
+async function sendLog(actionType, module, idNC, conformite, details){
+  const entry={
+    ...normalizeActionLog({
+      Timestamp:tsNow(),
+      User:_sess?.nom||'',
+      Module:module,
+      Action:actionType,
+      ID_NC:idNC||'',
+      Conformite:conformite||'',
+      Details:details||''
+    }),
+    _local:true
+  };
+  S.logs.unshift(entry);
+  if(S.panel==='logs') renderLogs();
+  const ok=await pushActionLogRemote(actionType, module, idNC, conformite, details);
+  if(ok){
+    entry._local=false;
+    if(S.panel==='logs') loadAndRenderLogs(true);
+  }
+}
+/*
+async function purgeActionLogs(){
+  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  if(!confirm('Vider tout le journal d\\'activité ?')) return;
+  const r=await POST({action:'purgeActionLogs'});
+  if(!r) return;
+  S.logs=[];
+  invalidateCache('"action":"getActionLogs"');
+  toast('Journal d\\'activité vidé','info');
+  loadAndRenderLogs(true);
+}
+*/
+async function purgeActionLogs(){
+  if(!isAdmin()){toast('Acces admin uniquement','error');return;}
+  if(!confirm("Vider tout le journal d'activite ?")) return;
+  const r=await POST({action:'purgeActionLogs'});
+  if(!r) return;
+  S.logs=[];
+  invalidateCache('"action":"getActionLogs"');
+  toast("Journal d'activite vide",'info');
+  loadAndRenderLogs(true);
+}
 </script>
 </body>
 </html>
