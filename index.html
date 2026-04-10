@@ -749,7 +749,7 @@ tbody tr:hover{background:var(--sf2)}
 // ════════════════════════════════════════════
 //  ⚠️  COLLER L'URL DU SCRIPT MASTER ICI
 // ════════════════════════════════════════════
-const MASTER_URL = 'https://script.google.com/macros/s/AKfycby0nIuSF0f5llrc4ncyhBkzBFScMEgEmOVfydaz9LCp31CQd94NrfM937kCWOCfHRdfcw/exec';
+const MASTER_URL = 'https://script.google.com/macros/s/AKfycbypmh5j--tnVBVofCBYEnVRJ3jPeAL40oYQFVL6u0qFwQOH7VH1x625XCGmDVmKrkg18w/exec';
 // Cache simple
 const cache = new Map();
 function getCached(key, ttl = 120000) {
@@ -781,15 +781,17 @@ let _serverRefreshTimer = null;
 
 /* ── SESSION ── */
 let _sess=null, API_URL='';
+const getAbonnementLevel=val=>String(val??'').trim()==='2'?'2':'1';
+const isTeamPlan=()=>isAdmin()&&getAbonnementLevel(_sess?.abonnement)==='2';
 
 function loadSession(){
   const raw=sessionStorage.getItem('easyhy_sess');
   if(!raw)return false;
-  try{_sess=JSON.parse(raw);API_URL=_sess.apiUrl||'';return !!_sess.apiUrl;}
+  try{_sess=JSON.parse(raw);_sess.abonnement=getAbonnementLevel(_sess.abonnement);API_URL=_sess.apiUrl||'';return !!_sess.apiUrl;}
   catch(e){return false;}
 }
-function saveSession(nom,id,apiUrl,statut,entreprise,mdp){
-  _sess={nom,id,apiUrl,statut:statut||'employe',entreprise:entreprise||'',Mdp:mdp||''};
+function saveSession(nom,id,apiUrl,statut,entreprise,mdp,abonnement){
+  _sess={nom,id,apiUrl,statut:statut||'employe',entreprise:entreprise||'',Mdp:mdp||'',abonnement:getAbonnementLevel(abonnement)};
   API_URL=apiUrl;
   sessionStorage.setItem('easyhy_sess',JSON.stringify(_sess));
 }
@@ -826,7 +828,10 @@ function showApp(){
   if(uid)uid.textContent='ID : '+(_sess.id||'');
   if(us){us.textContent=_sess.statut||'employe';us.className='user-statut '+(_sess.statut==='admin'?'admin':'employe');}
   // Show admin nav items
-  document.querySelectorAll('.ni-admin-only').forEach(el=>el.classList.toggle('visible',isAdmin()));
+  document.querySelectorAll('.ni-admin-only').forEach(el=>{
+    const teamOnly=el.id==='ni-team';
+    el.classList.toggle('visible',teamOnly?isTeamPlan():isAdmin());
+  });
 const btnVider=document.getElementById('btn-vider-logs');
 if(btnVider)btnVider.style.display=isAdmin()?'':'none';
 const btnProduits=document.getElementById('btn-produits');
@@ -868,7 +873,7 @@ async function doLogin(){
     const user=users.find(u=>String(u.Id).trim()===id&&String(u.Mdp).trim()===pwd);
     if(!user){lLoad(false);document.getElementById('l-pwd').value='';document.getElementById('l-pwd').focus();lErr('Identifiant ou mot de passe incorrect');return;}
     if(!user.Webappurl||!user.Webappurl.trim()){lLoad(false);lErr('Aucune URL webapp pour ce compte. Contactez l\'administrateur.');return;}
-    saveSession(user.Nom,user.Id,user.Webappurl.trim(),user.Statut,user.Entreprise,user.Mdp);
+    saveSession(user.Nom,user.Id,user.Webappurl.trim(),user.Statut,user.Entreprise,user.Mdp,user.Abonnement);
     lOk();
     setTimeout(()=>showApp(),600);
   }catch(e){lLoad(false);lErr('Erreur : '+e.message);}
@@ -1716,7 +1721,7 @@ async function sendLog(actionType, module, idNC, conformite, details){
 }
 */
 async function loadTeam(){
-  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  if(!isTeamPlan()){toast('Abonnement niveau 2 requis','error');return;}
   document.getElementById('team-grid').innerHTML='<div class="ld"><div class="sp"></div>Chargement…</div>';
   const users=await MGET({action:'getUsers',callerId:_sess.id,callerMdp:_sess.Mdp||''});
   if(!users)return;
@@ -1760,10 +1765,11 @@ function renderTeam(users){
   if(!users.length){document.getElementById('team-grid').innerHTML='<div class="empty"><div class="ei">👥</div><p>Aucun membre</p></div>';return;}
   document.getElementById('team-grid').innerHTML=users.map(u=>{
     const isAd=u.Statut==='admin';
+    const syncBadge=u._optimistic?`<span class="badge bgr" style="margin-left:8px">Synchronisation…</span>`:'';
     return`<div class="team-card">
       <div class="team-card-top">
         <div class="team-avatar ${isAd?'admin':'employe'}">${(u.Nom||'?')[0].toUpperCase()}</div>
-        <div><div class="team-name">${esc(u.Nom)}</div><div class="team-id">${esc(u.Id)}</div></div>
+        <div><div class="team-name">${esc(u.Nom)}</div><div class="team-id">${esc(u.Id)} ${syncBadge}</div></div>
         <span class="badge ${isAd?'bpu':'bsk'}" style="margin-left:auto">${isAd?'Admin':'Employé'}</span>
       </div>
       ${u.Entreprise?`<div class="team-entreprise">🏢 ${esc(u.Entreprise)}</div>`:'<div class="team-entreprise" style="color:var(--mu);font-style:italic">—</div>'}
@@ -1776,14 +1782,14 @@ function renderTeam(users){
 }
 
 function openAddUser(){
-  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  if(!isTeamPlan()){toast('Abonnement niveau 2 requis','error');return;}
   document.getElementById('mt').textContent='＋ Ajouter un membre';
   document.getElementById('mb').innerHTML=userForm({});
   document.getElementById('mf').innerHTML=`<button class="btn bg" onclick="clom()">Annuler</button><button class="btn bp" onclick="submitAddUser()">💾 Enregistrer</button>`;
   document.getElementById('mov').classList.add('open');
 }
 function openEditUser(id){
-  if(!isAdmin()){toast('Accès admin uniquement','error');return;}
+  if(!isTeamPlan()){toast('Abonnement niveau 2 requis','error');return;}
   const u=S.team.find(u=>u.Id===id);if(!u){toast('Introuvable','error');return;}
   document.getElementById('mt').textContent='✏️ Modifier — '+esc(u.Nom);
   document.getElementById('mb').innerHTML=userForm(u,true);
@@ -1800,6 +1806,7 @@ function userForm(u={},isEdit=false){
         <option value="employe" ${u.Statut==='employe'||!u.Statut?'selected':''}>Employé</option>
         <option value="admin" ${u.Statut==='admin'?'selected':''}>Administrateur</option>
       </select></div>
+    <input type="hidden" name="Abonnement" value="${esc(u.Abonnement||_sess.abonnement||'1')}"/>
     <input type="hidden" name="Entreprise" value="${u.Entreprise||_sess.entreprise||''}"/>
     <input type="hidden" name="Webappurl" value="${_sess.apiUrl||API_URL}"/>`;
 }
@@ -1808,25 +1815,69 @@ function collectUserForm(){
   document.querySelectorAll('#mb [name]').forEach(el=>{if(el.value!==''&&!el.readOnly)data[el.getAttribute('name')]=el.value.trim();});
   return data;
 }
+function normalizeTeamUser(u={}){
+  return {
+    Nom:u.Nom||'',
+    Id:u.Id||'',
+    Mdp:u.Mdp||'',
+    Webappurl:u.Webappurl||_sess.apiUrl||API_URL||'',
+    Statut:u.Statut||'employe',
+    Entreprise:u.Entreprise||_sess.entreprise||'',
+    Abonnement:getAbonnementLevel(u.Abonnement),
+    _optimistic:!!u._optimistic
+  };
+}
+function syncTeamView(){
+  if(S.panel==='team') renderTeam(S.team||[]);
+}
+function upsertTeamMember(member){
+  const normalized=normalizeTeamUser(member);
+  const idx=(S.team||[]).findIndex(u=>u.Id===normalized.Id);
+  if(idx===-1) S.team.unshift(normalized);
+  else S.team.splice(idx,1,{...S.team[idx],...normalized});
+  syncTeamView();
+}
+function removeTeamMember(id){
+  S.team=(S.team||[]).filter(u=>u.Id!==id);
+  syncTeamView();
+}
 async function submitAddUser(){
+  if(!isTeamPlan()){toast('Abonnement niveau 2 requis','error');return;}
   const data=collectUserForm();
   if(!data.Nom){toast('Nom obligatoire','error');return;}
   if(!data.Id){toast('Identifiant obligatoire','error');return;}
   if(!data.Mdp){toast('Mot de passe obligatoire','error');return;}
   if(!data.Statut){toast('Statut obligatoire','error');return;}
-  const r=await MPOST({action:'addUser',data});if(!r)return;
-  toast('Membre ajouté ✅','success');clom();loadTeam();
+  const snapshot=[...(S.team||[])];
+  const optimisticUser=normalizeTeamUser({...data,_optimistic:true});
+  upsertTeamMember(optimisticUser);
+  clom();
+  toast('Membre ajouté, synchronisation…','info');
+  const r=await MPOST({action:'addUser',data});if(!r){S.team=snapshot;syncTeamView();return;}
+  upsertTeamMember({...optimisticUser,_optimistic:false});
+  toast('Membre ajouté ✅','success');
 }
 async function submitEditUser(id){
+  if(!isTeamPlan()){toast('Abonnement niveau 2 requis','error');return;}
   const data=collectUserForm();
   if(!data.Nom){toast('Nom obligatoire','error');return;}
-  const r=await MPOST({action:'updateUser',targetId:id,data});if(!r)return;
-  toast('Mis à jour ✅','success');clom();loadTeam();
+  const snapshot=[...(S.team||[])];
+  const current=(S.team||[]).find(u=>u.Id===id);
+  upsertTeamMember({...current,...data,Id:id,_optimistic:true});
+  clom();
+  toast('Modification enregistrée localement…','info');
+  const r=await MPOST({action:'updateUser',targetId:id,data});if(!r){S.team=snapshot;syncTeamView();return;}
+  upsertTeamMember({...current,...data,Id:id,_optimistic:false});
+  toast('Mis à jour ✅','success');
 }
 async function deleteUser(id){
+  if(!isTeamPlan()){toast('Abonnement niveau 2 requis','error');return;}
   if(!confirm('Supprimer ce membre ?'))return;
-  const r=await MPOST({action:'deleteUser',targetId:id});if(!r)return;
-  toast('Supprimé','info');loadTeam();
+  const snapshot=[...(S.team||[])];
+  removeTeamMember(id);
+  toast('Suppression en cours…','info');
+  const r=await MPOST({action:'deleteUser',targetId:id});if(!r){S.team=snapshot;syncTeamView();return;}
+  toast('Supprimé','info');
 }
 
 /* ── LOGIN LOGS ── */
