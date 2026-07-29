@@ -502,7 +502,6 @@ tbody tr:hover{background:var(--sf2)}
         <div class="nsec">Outils</div>
         <div class="ni" id="ni-logs" data-p="logs" onclick="showPanel('logs',this)"><span class="ic">📋</span>Journaux</div>
         <div class="ni ni-admin-only" id="ni-team" data-p="team" onclick="showPanel('team',this)"><span class="ic">👥</span>Équipe</div>
-        <div class="ni ni-admin-only" id="ni-loginlogs" data-p="loginlogs" onclick="showPanel('loginlogs',this)"><span class="ic">🔑</span>Connexions</div>
         <div class="ni ni-admin-only" id="ni-purge" data-p="purge" onclick="showPanel('purge',this)"><span class="ic">🗄</span>Clôture &amp; Export</div>
       </nav>
       <div class="thermo-widget">
@@ -601,6 +600,7 @@ tbody tr:hover{background:var(--sf2)}
     <div class="tb-bar">
       <input type="text" placeholder="Rechercher BL, fournisseur…" oninput="filterBL(this.value)"/>
       <button class="btn bp" onclick="openAddBL()">＋ Nouveau BL</button>
+      <button class="btn bw sm" onclick="exportModuleCSV('reception')">📥 Export CSV</button>
       <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
     </div>
     <div class="twrap">
@@ -626,6 +626,7 @@ tbody tr:hover{background:var(--sf2)}
 </div>
         <div class="panel" id="panel-froid">
   <div class="tb-bar">
+    <button class="btn bw sm" onclick="exportModuleCSV('froid')">📥 Export CSV</button>
     <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
     <button class="btn bp" id="btn-add-app-froid" onclick="openAddAppareilModal('froid')" style="display:none">＋ Appareil</button>
   </div>
@@ -633,20 +634,22 @@ tbody tr:hover{background:var(--sf2)}
 </div>
         <div class="panel" id="panel-huiles">
   <div class="tb-bar">
+    <button class="btn bw sm" onclick="exportModuleCSV('huiles')">📥 Export CSV</button>
     <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
     <button class="btn bp" id="btn-add-app-huiles" onclick="openAddAppareilModal('huiles')" style="display:none">＋ Appareil</button>
   </div>
   <div id="huiles-appareils-list"><div class="ld"><div class="sp"></div></div></div>
 </div>
-        <div class="panel" id="panel-refroidissement"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('refroidissement',this.value)"/><button class="btn bp" onclick="openAdd('refroidissement')">＋ Ajouter</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+63°C → +10°C en ≤ 2h</strong></div><div class="twrap"><table id="table-refroidissement"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-        <div class="panel" id="panel-congelation"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('congelation',this.value)"/><button class="btn bp" onclick="openAdd('congelation')">＋ Ajouter</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+10°C → -18°C à cœur, idéalement &lt;4h</strong></div><div class="twrap"><table id="table-congelation"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
-        <div class="panel" id="panel-remise"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('remise',this.value)"/><button class="btn bp" onclick="openAdd('remise')">＋ Ajouter</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+3°C → ≥+63°C en ≤ 1h</strong> · Ne jamais réchauffer plusieurs fois</div><div class="twrap"><table id="table-remise"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-refroidissement"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('refroidissement',this.value)"/><button class="btn bp" onclick="openAdd('refroidissement')">＋ Ajouter</button><button class="btn bw sm" onclick="exportModuleCSV('refroidissement')">📥 Export CSV</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+63°C → +10°C en ≤ 2h</strong></div><div class="twrap"><table id="table-refroidissement"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-congelation"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('congelation',this.value)"/><button class="btn bp" onclick="openAdd('congelation')">＋ Ajouter</button><button class="btn bw sm" onclick="exportModuleCSV('congelation')">📥 Export CSV</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+10°C → -18°C à cœur, idéalement &lt;4h</strong></div><div class="twrap"><table id="table-congelation"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
+        <div class="panel" id="panel-remise"><div class="tb-bar"><input type="text" placeholder="Rechercher…" oninput="filterTable('remise',this.value)"/><button class="btn bp" onclick="openAdd('remise')">＋ Ajouter</button><button class="btn bw sm" onclick="exportModuleCSV('remise')">📥 Export CSV</button><button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button></div><div class="rh">🔹 Règle : <strong>+3°C → ≥+63°C en ≤ 1h</strong> · Ne jamais réchauffer plusieurs fois</div><div class="twrap"><table id="table-remise"><thead><tr><th>ID</th><th>Date</th><th>Produit</th><th>H Début</th><th>T°C Début</th><th>H Fin</th><th>T°C Fin</th><th>Durée</th><th>Conformité</th><th>Statut</th><th>Actions</th></tr></thead><tbody><tr><td colspan="11"><div class="ld"><div class="sp"></div></div></td></tr></tbody></table></div></div>
 <!-- NETTOYAGE -->
         <div class="panel" id="panel-nettoyage">
           <div class="tb-bar">
             <input type="text" placeholder="Rechercher zone, tâche…" oninput="filterNettoyage(this.value)"/>
             <button class="btn bp" id="btn-add-zone" onclick="openAddZone()" style="display:none">＋ Nouvelle zone</button>
 <button class="btn bg" id="btn-produits" onclick="openProduitsModal()" style="display:none">🧴 Produits</button>
+            <button class="btn bw sm" onclick="exportModuleCSV('nettoyage')">📥 Export CSV</button>
             <button class="btn bg" onclick="refreshCurrent()">↻ Actualiser</button>
           </div>
           <div id="nettoyage-zones"></div>
@@ -663,6 +666,7 @@ tbody tr:hover{background:var(--sf2)}
             <select id="log-filter-module" onchange="renderLogs()"><option value="">Tous les modules</option><option value="reception">Réception</option><option value="froid">Froid</option><option value="huiles">Huiles</option><option value="refroidissement">Refroidissement</option><option value="congelation">Congélation</option><option value="remise">Remise en T°</option></select>
             <select id="log-filter-action" onchange="renderLogs()"><option value="">Toutes les actions</option><option value="add">Ajout</option><option value="update">Modification</option><option value="delete">Suppression</option><option value="resolveNC">Résolution NC</option></select>
             <input type="text" placeholder="Rechercher…" id="log-search" oninput="renderLogs()" style="flex:1;min-width:160px"/>
+            <button class="btn bw sm" onclick="exportModuleCSV('logs')">📥 Export CSV</button>
             <button class="btn bg sm" onclick="purgeActionLogs()" id="btn-vider-logs" style="display:none">🗑 Vider</button>
           </div>
           <div class="card">
@@ -678,25 +682,6 @@ tbody tr:hover{background:var(--sf2)}
             <button class="btn bg" onclick="loadTeam()">↻ Actualiser</button>
           </div>
           <div class="team-grid" id="team-grid"><div class="ld"><div class="sp"></div>Chargement…</div></div>
-        </div>
-
-        <!-- CONNEXIONS (admin only) -->
-        <div class="panel" id="panel-loginlogs">
-          <div class="log-filters">
-  <input type="text" placeholder="Rechercher…" id="ll-search" oninput="renderLoginLogs()" style="flex:1;min-width:160px"/>
-  <button class="btn bg sm" onclick="loadLoginLogs()">↻ Actualiser</button>
-</div>
-          <div class="card">
-            <div class="card-h"><div class="card-t">🔑 Journal des connexions</div><span id="ll-count" style="font-size:11px;color:var(--mu)"></span></div>
-            <div class="card-b" style="padding:0">
-              <div class="twrap" style="border:none;border-radius:0;box-shadow:none">
-                <table id="table-loginlogs">
-                  <thead><tr><th>Date/Heure</th><th>Id</th><th>Nom</th><th>Statut</th><th></th></tr></thead>
-                  <tbody><tr><td colspan="5"><div class="ld"><div class="sp"></div></div></td></tr></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- CLÔTURE & EXPORT (admin only) -->
@@ -830,7 +815,7 @@ function showApp(){
   if(us){us.textContent=_sess.statut||'employe';us.className='user-statut '+(_sess.statut==='admin'?'admin':'employe');}
   // Show admin nav items
   document.querySelectorAll('.ni-admin-only').forEach(el=>{
-    const restrictedPlanOnly=['ni-team','ni-loginlogs'].includes(el.id);
+    const restrictedPlanOnly=(el.id==='ni-team');
     el.classList.toggle('visible',restrictedPlanOnly ? isTeamPlan() : isAdmin());
   });
 const navLogs=document.getElementById('ni-logs');
@@ -933,7 +918,7 @@ function initBubbles(){
 }
 
 /* ── STATE ── */
-const S={data:{},panel:'dashboard',chart:null,appareils:{froid:[],huiles:[]},logs:[],team:[],loginLogs:[],_visitedModules:new Set()};
+const S={data:{},panel:'dashboard',chart:null,appareils:{froid:[],huiles:[]},logs:[],team:[],_visitedModules:new Set()};
 const MM={
   reception:{label:'Réception',icon:'🚚',col:'#2563eb',col2:'#0ea5e9'},
   froid:{label:'Contrôle Froid',icon:'❄️',col:'#0891b2',col2:'#67e8f9'},
@@ -1027,7 +1012,6 @@ function invalidateCachesForPayload(b) {
   if (b.action === 'addAppareil' || b.action === 'deleteAppareil' || b.action === 'updateAppareil' || b.action === 'updateAppareilVerif') invalidateCache('"action":"getAppareils"');
   if (b.action === 'addTache' || b.action === 'updateTache' || b.action === 'deleteTache' || b.action === 'effectuerTache') invalidateCache('"action":"getNettoyagePlan"');
   if (b.action === 'addProduit' || b.action === 'updateProduit' || b.action === 'deleteProduit') invalidateCache('"action":"getProduits"');
-  if (b.action === 'deleteLoginLog' || b.action === 'purgeLoginLogs' || b.action === 'loginLog') invalidateCache('"action":"getLoginLogs"');
   if (b.action === 'addActionLog' || b.action === 'purgeActionLogs') invalidateCache('"action":"getActionLogs"');
   if (b.action === 'purgeAll') cache.clear();
   invalidateCache('"action":"getDashboardFull"');
@@ -1308,18 +1292,17 @@ async function MPOST(b){
 const _visitedMods=new Set();
 function showPanel(id,el){
   if(id==='team'&&!isTeamPlan()){toast('Abonnement niveau 2 requis','error');id='dashboard';el=document.querySelector('[data-p=dashboard]');}
-  if((id==='logs'||id==='loginlogs')&&!hasLogsAccess()){toast('Abonnement niveau 2 requis','error');id='dashboard';el=document.querySelector('[data-p=dashboard]');}
+  if(id==='logs'&&!hasLogsAccess()){toast('Abonnement niveau 2 requis','error');id='dashboard';el=document.querySelector('[data-p=dashboard]');}
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
   document.getElementById('panel-'+id).classList.add('active');
   if(el)el.classList.add('active');
   S.panel=id;
   const m=MM[id];
-  document.getElementById('ptitle').textContent=m?m.icon+'  '+m.label:{dashboard:'📊  Tableau de bord',logs:'📋  Journaux',team:'👥  Équipe',loginlogs:'🔑  Connexions',purge:'🗄  Clôture & Export'}[id]||id;
+  document.getElementById('ptitle').textContent=m?m.icon+'  '+m.label:{dashboard:'📊  Tableau de bord',logs:'📋  Journaux',team:'👥  Équipe',purge:'🗄  Clôture & Export'}[id]||id;
   if(id==='dashboard')loadDashboard();
   else if(id==='logs')loadAndRenderLogs();
   else if(id==='team')loadTeam();
-  else if(id==='loginlogs')loadLoginLogs();
   else if(id==='purge'){/* static */}
   else{
     loadModule(id);
@@ -1330,7 +1313,6 @@ function refreshCurrent(){
   if(S.panel==='dashboard') loadDashboard(true);
   else if(S.panel==='logs') loadAndRenderLogs(true);
   else if(S.panel==='team') loadTeam(true);
-  else if(S.panel==='loginlogs') loadLoginLogs(true);
   else loadModule(S.panel, true);
 }
 
@@ -1894,62 +1876,12 @@ async function deleteUser(id){
 }
 
 /* ── LOGIN LOGS ── */
-async function loadLoginLogs(forceRefresh = false){
-  if(!hasLogsAccess()){toast('Abonnement niveau 2 requis','error');return;}
-  // Bouton purge
-  const bar=document.querySelector('#panel-loginlogs .log-filters');
-  if(bar&&!document.getElementById('btn-purge-ll')){
-    const btn=document.createElement('button');
-    btn.className='btn bdanger sm';btn.id='btn-purge-ll';
-    btn.textContent='🗑 Tout vider';
-    btn.onclick=purgeAllLoginLogs;
-    bar.appendChild(btn);
-  }
-  const tb=document.querySelector('#table-loginlogs tbody');
-  tb.innerHTML='<tr><td colspan="6"><div class="ld"><div class="sp"></div></div></td></tr>';
-  const logs=await GET({action:'getLoginLogs'}, forceRefresh);
-  if(!logs)return;
-  S.loginLogs=logs;renderLoginLogs();
-}
-async function purgeAllLoginLogs(){
-  if(!confirm('Vider tout le journal des connexions ?'))return;
-  const r=await POST({action:'purgeLoginLogs'});
-  if(!r)return;
-  toast('Journal vidé','info');
-  loadLoginLogs(true);
-}
-
-async function deleteLoginLog(ts, userId){
-  if(!confirm('Supprimer cette entrée ?'))return;
-  const r=await POST({action:'deleteLoginLog', ts, userId});
-  if(!r)return;
-  toast('Supprimé','info');
-  loadLoginLogs(true);
-}
-function renderLoginLogs(){
-  const srch=(document.getElementById('ll-search')?.value||'').toLowerCase();
-  const logs=srch?S.loginLogs.filter(l=>Object.values(l).some(v=>String(v).toLowerCase().includes(srch))):S.loginLogs;
-  document.getElementById('ll-count').textContent=logs.length+' connexion'+(logs.length>1?'s':'');
-  const tb=document.querySelector('#table-loginlogs tbody');
-  if(!logs.length){tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="ei">🔑</div><p>Aucune connexion enregistrée</p></div></td></tr>`;return;}
-  tb.innerHTML=logs.map(l=>{
-    const isAd=l['Statut']==='admin';
-    return`<tr>
-      <td style="font-family:var(--fm);font-size:11px;color:var(--mu)">${l['Timestamp']||''}</td>
-      <td><code style="color:var(--bl);background:rgba(37,99,235,.08);padding:2px 6px;border-radius:4px;font-size:11px">${esc(l['UserId']||'')}</code></td>
-      <td style="font-weight:600">${esc(l['UserNom']||'')}</td>
-      <td><span class="badge ${isAd?'bpu':'bsk'}">${isAd?'Admin':'Employé'}</span></td>
-      ${isAdmin()?`<td><button class="btn bd2 sm" onclick="deleteLoginLog('${esc(l['Timestamp']||'')}','${esc(l['UserId']||'')}')">🗑</button></td>`:'<td></td>'}
-    </tr>`;
-  }).join('');
-}
-
 /* ── CLÔTURE & EXPORT CSV ── */
 function refreshSubscriptionUI(){
   const exportScope=document.getElementById('purge-export-scope');
   if(exportScope){
     exportScope.textContent=hasLogsAccess()
-      ? 'Toutes les feuilles (Réception, Froid, Huiles, Refroidissement, Congélation, Remise en T°, Historique de nettoyage, logs et journaux) sont exportées en CSV'
+      ? 'Toutes les feuilles (Réception, Froid, Huiles, Refroidissement, Congélation, Remise en T°, Historique de nettoyage, journal d\'activité) sont exportées en CSV'
       : 'Toutes les feuilles (Réception, Froid, Huiles, Refroidissement, Congélation, Remise en T°, Historique de nettoyage) sont exportées en CSV';
   }
 }
@@ -1962,6 +1894,130 @@ async function refreshSessionFromMaster(){
     if(!fresh) return;
     saveSession(fresh.Nom||_sess.nom,_sess.id,fresh.Webappurl?.trim()||_sess.apiUrl,fresh.Statut||_sess.statut,fresh.Entreprise||_sess.entreprise,_sess.Mdp||fresh.Mdp,fresh.Abonnement);
   }catch(e){}
+}
+
+/* ── EXPORT MODULE CSV (tableaux structurés) ── */
+function _csvVal(v) { return '"'+String(v??'').replace(/"/g,'""')+'"'; }
+function _csvRow(arr) { return arr.map(_csvVal).join(';'); }
+
+async function exportModuleCSV(module) {
+  try {
+    let rows = [];
+    let title = '';
+    const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
+    toast('Préparation de l\'export…','info');
+    
+    if (module === 'reception') {
+      const bls = typeof _blData !== 'undefined' ? _blData : [];
+      title = 'Reception_BL';
+      const headers = ['ID BL','Date','Fournisseur','N° BL','Type Produit','Produit','T°C Entrée (°C)','T°C Cible (°C)','Conformité','Action Corrective','Réglé/Non-réglé'];
+      rows.push(_csvRow(headers));
+      bls.forEach(bl => {
+        const blId = bl.ID_BL||'';
+        const blDate = bl.Date||'';
+        const blFour = bl.Fournisseur||'';
+        const blNum = bl['N° BL']||'';
+        if (bl.lignes && bl.lignes.length) {
+          bl.lignes.forEach(l => {
+            rows.push(_csvRow([blId, blDate, blFour, blNum, l['Type produit']||'', l['Produit']||'', l['T°C entrée']??'', l['T°C cible']??'', l['Conformité']||'', l['Action']||'', l['Réglé/Non-réglé']||'']));
+          });
+        } else {
+          rows.push(_csvRow([blId, blDate, blFour, blNum, '','','','',bl.Conformite||'','','']));
+        }
+      });
+      
+    } else if (module === 'froid') {
+      title = 'Controle_Froid_Releves';
+      const data = await GET({action:'getAll', module:'froid'});
+      const items = (data && data.length) ? data : (S.data.froid||[]);
+      const headers = ['ID','Appareil','Type Contrôle','Date','Heure','T°C Entrée (°C)','T°C Cible (°C)','T°C Critique (°C)','Conformité','Action Corrective','Réglé/Non-réglé'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        rows.push(_csvRow([r['ID_NC']||'', r['Appareil']||'', r['Type_controle']||'', r['Date']||'', r['Heure']||'', r['T°C entrée']??'', r['T°C cible']??'', r['T°C critique']??'', r['Conformité']||'', r['Action']||'', r['Réglé/Non-réglé']||'']));
+      });
+      
+    } else if (module === 'huiles') {
+      title = 'Huiles_Releves';
+      const data = await GET({action:'getAll', module:'huiles'});
+      const items = (data && data.length) ? data : (S.data.huiles||[]);
+      const headers = ['ID','Date','Appareil','Contrôle Chimique','Contrôle Visuel','Conformité','Visa','Action Corrective','Réglé/Non-réglé'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        rows.push(_csvRow([r['ID_NC']||'', r['Date']||'', r['Appareil']||'', r['Contrôle chimique']||'', r['Contrôle visuel']||'', r['Conformité']||'', r['Visa']||'', r['Action']||'', r['Réglé/Non-réglé']||'']));
+      });
+      
+    } else if (module === 'refroidissement') {
+      title = 'Refroidissement';
+      const items = S.data.refroidissement || [];
+      const headers = ['ID','Date','Produit','H Début','T°C Début (°C)','H Fin','T°C Fin (°C)','Durée (min)','Conformité','Action Corrective','Réglé/Non-réglé'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        rows.push(_csvRow([r['ID_NC']||'', r['Date']||'', r['Produit']||'', r['H début']||'', r['T°C début']??'', r['H fin']||'', r['T°C fin']??'', r['Delta']||'', r['Conformité']||'', r['Action']||'', r['Réglé/Non-réglé']||'']));
+      });
+      
+    } else if (module === 'congelation') {
+      title = 'Congelation';
+      const items = S.data.congelation || [];
+      const headers = ['ID','Date','Produit','H Début','T°C Début (°C)','H Fin','T°C Fin (°C)','Durée (min)','Conformité','Action Corrective','Réglé/Non-réglé'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        rows.push(_csvRow([r['ID_NC']||'', r['Date']||'', r['Produit']||'', r['H début']||'', r['T°C début']??'', r['H fin']||'', r['T°C fin']??'', r['Delta']||'', r['Conformité']||'', r['Action']||'', r['Réglé/Non-réglé']||'']));
+      });
+      
+    } else if (module === 'remise') {
+      title = 'Remise_en_Temperature';
+      const items = S.data.remise || [];
+      const headers = ['ID','Date','Produit','H Début','T°C Début (°C)','H Fin','T°C Fin (°C)','Durée (min)','Conformité','Action Corrective','Réglé/Non-réglé'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        rows.push(_csvRow([r['ID_NC']||'', r['Date']||'', r['Produit']||'', r['H début']||'', r['T°C début']??'', r['H fin']||'', r['T°C fin']??'', r['Delta']||'', r['Conformité']||'', r['Action']||'', r['Réglé/Non-réglé']||'']));
+      });
+      
+    } else if (module === 'nettoyage') {
+      title = 'Nettoyage_Plan';
+      const items = typeof _nettoyageData !== 'undefined' ? _nettoyageData : [];
+      const headers = ['Zone','Élément / Tâche','Fréquence','Produit Utilisé','Responsable','Statut','Dernier Nettoyage','Prochain Nettoyage'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        rows.push(_csvRow([r['Zone']||'', r['Élément']||r['Tâche']||'', r['Fréquence']||'', r['Produit']||'', r['Responsable']||'', r['Statut']||'', r['Dernier nettoyage']||'', r['Prochain nettoyage']||'']));
+      });
+      
+    } else if (module === 'logs') {
+      title = 'Journal_Activite';
+      const items = (S.logs || []).map(normalizeActionLog);
+      const al = {add:'Ajout',update:'Modification',delete:'Suppression',resolveNC:'NC Résolue'};
+      const headers = ['Date/Heure','Utilisateur','Module','Action','ID Référence','Conformité','Détails'];
+      rows.push(_csvRow(headers));
+      items.forEach(r => {
+        const modLabel = MM[r.Module]?.label || r.Module || '';
+        const actLabel = al[r.Action] || r.Action || '';
+        const conf = r['Conformité'] || '';
+        const details = r['Détails'] || '';
+        rows.push(_csvRow([r.Timestamp||'', r.User||'', modLabel, actLabel, r.ID_NC||'', conf, details]));
+      });
+      
+    } else {
+      toast('Module inconnu pour export','error');
+      return;
+    }
+    
+    if (rows.length <= 1) {
+      toast('Aucune donnée à exporter pour ce module','info');
+      return;
+    }
+    
+    const csvContent = rows.join('\r\n');
+    const blob = new Blob(['\uFEFF'+csvContent], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'EasyHygie_'+title+'_'+ts+'.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast('Export CSV téléchargé ✅ ('+rows.length+' lignes)','success');
+  } catch(e) {
+    toast('Erreur export CSV : '+e.message,'error');
+  }
 }
 
 async function doPurge(){
@@ -2001,15 +2057,7 @@ if(actionLogs&&actionLogs.length){
   csvLines.push(keysA.map(k=>'"'+k+'"').join(','));
   actionLogs.forEach(r=>csvLines.push(keysA.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
   csvLines.push('');
-}
-const loginLogs=await GET({action:'getLoginLogs'});
-if(loginLogs&&loginLogs.length){
-  csvLines.push('=== Journal des connexions ===');
-  const keysL=Object.keys(loginLogs[0]).filter(k=>!k.startsWith('_'));
-  csvLines.push(keysL.map(k=>'"'+k+'"').join(','));
-  loginLogs.forEach(r=>csvLines.push(keysL.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(',')));
-  csvLines.push('');
-}
+  }
 }
 const histoNet=await GET({action:'getNettoyageHistorique'});
 if(histoNet&&histoNet.length){
@@ -2021,7 +2069,7 @@ if(histoNet&&histoNet.length){
 }
   // 3. Télécharger
   txt.textContent='Téléchargement…';fill.style.width='65%';
-  const blob=new Blob(['\uFEFF'+csvLines.join('\n')],{type:'text/csv;charset=utf-8;'});
+  const blob=new Blob(['\uFEFF'+csvLines.join('\r\n')],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');a.href=url;a.download='EasyHygie_Cloture_'+ts+'.csv';a.click();
   URL.revokeObjectURL(url);
@@ -2032,10 +2080,8 @@ if(histoNet&&histoNet.length){
     txt.textContent=`Purge ${MM[m].label}…`;fill.style.width=(65+i/modules.length*30)+'%';
     await POST({action:'purgeModule',module:m});
   }
-  // Purger aussi les LoginLogs
   if(hasLogsAccess()){
     txt.textContent='Purge journaux…';fill.style.width='92%';
-    await POST({action:'purgeLoginLogs'});
     await POST({action:'purgeActionLogs'});
   }
 txt.textContent='Purge historique nettoyage…';fill.style.width='96%';
